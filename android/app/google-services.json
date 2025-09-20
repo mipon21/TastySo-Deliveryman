@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "866971833093",
+    "project_id": "ahilo-5ab21",
+    "storage_bucket": "ahilo-5ab21.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:866971833093:android:c5f43bd6283b22a1e45d6c",
+        "android_client_info": {
+          "package_name": "com.sixamtech.stackfooduser"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcrW1bG1wrIhvQT9K5dtgBHE_2O2AU7lI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:866971833093:android:7c2608d55ecfd9cae45d6c",
+        "android_client_info": {
+          "package_name": "com.tastysobd.delivery"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcrW1bG1wrIhvQT9K5dtgBHE_2O2AU7lI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:866971833093:android:23101f8a4c3dae12e45d6c",
+        "android_client_info": {
+          "package_name": "com.tastysobd.restaurant"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcrW1bG1wrIhvQT9K5dtgBHE_2O2AU7lI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
