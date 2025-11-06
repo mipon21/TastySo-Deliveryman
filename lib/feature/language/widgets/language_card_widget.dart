@@ -1,9 +1,9 @@
-import 'package:stackfood_multivendor_driver/feature/language/controllers/localization_controller.dart';
-import 'package:stackfood_multivendor_driver/feature/language/domain/models/language_model.dart';
-import 'package:stackfood_multivendor_driver/util/styles.dart';
+import 'package:tastyso_delivery_driver/feature/language/controllers/localization_controller.dart';
+import 'package:tastyso_delivery_driver/feature/language/domain/models/language_model.dart';
+import 'package:tastyso_delivery_driver/util/styles.dart';
 import 'package:flutter/material.dart';
-import 'package:stackfood_multivendor_driver/util/app_constants.dart';
-import 'package:stackfood_multivendor_driver/util/dimensions.dart';
+import 'package:tastyso_delivery_driver/util/app_constants.dart';
+import 'package:tastyso_delivery_driver/util/dimensions.dart';
 
 class LanguageCardWidget extends StatelessWidget {
   final LanguageModel languageModel;

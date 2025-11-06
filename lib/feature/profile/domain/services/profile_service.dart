@@ -1,12 +1,12 @@
-import 'package:stackfood_multivendor_driver/common/models/response_model.dart';
-import 'package:stackfood_multivendor_driver/feature/profile/domain/models/profile_model.dart';
-import 'package:stackfood_multivendor_driver/feature/profile/domain/models/record_location_body.dart';
-import 'package:stackfood_multivendor_driver/feature/profile/domain/models/shift_model.dart';
-import 'package:stackfood_multivendor_driver/feature/profile/domain/repositories/profile_repository_interface.dart';
-import 'package:stackfood_multivendor_driver/feature/profile/domain/services/profile_service_interface.dart';
+import 'package:tastyso_delivery_driver/common/models/response_model.dart';
+import 'package:tastyso_delivery_driver/feature/profile/domain/models/profile_model.dart';
+import 'package:tastyso_delivery_driver/feature/profile/domain/models/record_location_body.dart';
+import 'package:tastyso_delivery_driver/feature/profile/domain/models/shift_model.dart';
+import 'package:tastyso_delivery_driver/feature/profile/domain/repositories/profile_repository_interface.dart';
+import 'package:tastyso_delivery_driver/feature/profile/domain/services/profile_service_interface.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/custom_alert_dialog_widget.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_alert_dialog_widget.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart' as geo_coding;
 
@@ -25,13 +25,16 @@ class ProfileService implements ProfileServiceInterface {
   }
 
   @override
-  Future<ResponseModel?> updateProfile(ProfileModel userInfoModel, XFile? data, String token) async {
-    return await profileRepositoryInterface.updateProfile(userInfoModel, data, token);
+  Future<ResponseModel?> updateProfile(
+      ProfileModel userInfoModel, XFile? data, String token) async {
+    return await profileRepositoryInterface.updateProfile(
+        userInfoModel, data, token);
   }
 
   @override
   Future<ResponseModel?> updateActiveStatus({int? shiftId}) async {
-    return await profileRepositoryInterface.updateActiveStatus(shiftId: shiftId);
+    return await profileRepositoryInterface.updateActiveStatus(
+        shiftId: shiftId);
   }
 
   @override
@@ -57,11 +60,14 @@ class ProfileService implements ProfileServiceInterface {
   @override
   Future<String> addressPlaceMark(Position locationResult) async {
     String address;
-    try{
-      List<geo_coding.Placemark> addresses = await geo_coding.placemarkFromCoordinates(locationResult.latitude, locationResult.longitude);
+    try {
+      List<geo_coding.Placemark> addresses =
+          await geo_coding.placemarkFromCoordinates(
+              locationResult.latitude, locationResult.longitude);
       geo_coding.Placemark placeMark = addresses.first;
-      address = '${placeMark.name}, ${placeMark.subAdministrativeArea}, ${placeMark.isoCountryCode}';
-    }catch(e) {
+      address =
+          '${placeMark.name}, ${placeMark.subAdministrativeArea}, ${placeMark.isoCountryCode}';
+    } catch (e) {
       address = 'Unknown Location Found';
     }
     return address;
@@ -72,26 +78,38 @@ class ProfileService implements ProfileServiceInterface {
     LocationPermission permission = await Geolocator.requestPermission();
     permission = await Geolocator.checkPermission();
 
-    while(Get.isDialogOpen == true) {
+    while (Get.isDialogOpen == true) {
       Get.back();
     }
 
-    if(permission == LocationPermission.denied/* || (GetPlatform.isIOS ? false : permission == LocationPermission.whileInUse)*/) {
-      Get.dialog(CustomAlertDialogWidget(description: 'you_denied'.tr, onOkPressed: () async {
-        Get.back();
-        final perm = await Geolocator.requestPermission();
-        if(perm == LocationPermission.deniedForever) await Geolocator.openAppSettings();
-        if(GetPlatform.isAndroid) checkPermission(callback);
-      }));
-    }else if(permission == LocationPermission.deniedForever || (GetPlatform.isIOS ? false : permission == LocationPermission.whileInUse)) {
-      Get.dialog(CustomAlertDialogWidget(description:  permission == LocationPermission.whileInUse ? 'you_denied'.tr : 'you_denied_forever'.tr, onOkPressed: () async {
-        Get.back();
-        await Geolocator.openAppSettings();
-        Future.delayed(Duration(seconds: 3), () {
-          if(GetPlatform.isAndroid) checkPermission(callback);
-        });
-      }));
-    }else {
+    if (permission ==
+        LocationPermission
+            .denied /* || (GetPlatform.isIOS ? false : permission == LocationPermission.whileInUse)*/) {
+      Get.dialog(CustomAlertDialogWidget(
+          description: 'you_denied'.tr,
+          onOkPressed: () async {
+            Get.back();
+            final perm = await Geolocator.requestPermission();
+            if (perm == LocationPermission.deniedForever)
+              await Geolocator.openAppSettings();
+            if (GetPlatform.isAndroid) checkPermission(callback);
+          }));
+    } else if (permission == LocationPermission.deniedForever ||
+        (GetPlatform.isIOS
+            ? false
+            : permission == LocationPermission.whileInUse)) {
+      Get.dialog(CustomAlertDialogWidget(
+          description: permission == LocationPermission.whileInUse
+              ? 'you_denied'.tr
+              : 'you_denied_forever'.tr,
+          onOkPressed: () async {
+            Get.back();
+            await Geolocator.openAppSettings();
+            Future.delayed(Duration(seconds: 3), () {
+              if (GetPlatform.isAndroid) checkPermission(callback);
+            });
+          }));
+    } else {
       callback();
     }
   }

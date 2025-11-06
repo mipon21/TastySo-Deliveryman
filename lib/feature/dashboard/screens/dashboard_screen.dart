@@ -1,26 +1,26 @@
 import 'dart:async';
-import 'package:stackfood_multivendor_driver/feature/auth/controllers/auth_controller.dart';
-import 'package:stackfood_multivendor_driver/feature/disbursements/helper/disbursement_helper.dart';
-import 'package:stackfood_multivendor_driver/feature/home/screens/home_screen.dart';
-import 'package:stackfood_multivendor_driver/feature/order/controllers/order_controller.dart';
-import 'package:stackfood_multivendor_driver/feature/dashboard/widgets/bottom_nav_item_widget.dart';
-import 'package:stackfood_multivendor_driver/feature/dashboard/widgets/new_request_dialog_widget.dart';
-import 'package:stackfood_multivendor_driver/feature/order/screens/order_screen.dart';
-import 'package:stackfood_multivendor_driver/feature/order/screens/running_order_screen.dart';
-import 'package:stackfood_multivendor_driver/feature/profile/controllers/profile_controller.dart';
-import 'package:stackfood_multivendor_driver/feature/profile/screens/profile_screen.dart';
-import 'package:stackfood_multivendor_driver/feature/order/screens/order_request_screen.dart';
-import 'package:stackfood_multivendor_driver/helper/custom_print_helper.dart';
-import 'package:stackfood_multivendor_driver/helper/notification_helper.dart';
-import 'package:stackfood_multivendor_driver/helper/route_helper.dart';
-import 'package:stackfood_multivendor_driver/main.dart';
-import 'package:stackfood_multivendor_driver/util/dimensions.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/custom_alert_dialog_widget.dart';
+import 'package:tastyso_delivery_driver/feature/auth/controllers/auth_controller.dart';
+import 'package:tastyso_delivery_driver/feature/disbursements/helper/disbursement_helper.dart';
+import 'package:tastyso_delivery_driver/feature/home/screens/home_screen.dart';
+import 'package:tastyso_delivery_driver/feature/order/controllers/order_controller.dart';
+import 'package:tastyso_delivery_driver/feature/dashboard/widgets/bottom_nav_item_widget.dart';
+import 'package:tastyso_delivery_driver/feature/dashboard/widgets/new_request_dialog_widget.dart';
+import 'package:tastyso_delivery_driver/feature/order/screens/order_screen.dart';
+import 'package:tastyso_delivery_driver/feature/order/screens/running_order_screen.dart';
+import 'package:tastyso_delivery_driver/feature/profile/controllers/profile_controller.dart';
+import 'package:tastyso_delivery_driver/feature/profile/screens/profile_screen.dart';
+import 'package:tastyso_delivery_driver/feature/order/screens/order_request_screen.dart';
+import 'package:tastyso_delivery_driver/helper/custom_print_helper.dart';
+import 'package:tastyso_delivery_driver/helper/notification_helper.dart';
+import 'package:tastyso_delivery_driver/helper/route_helper.dart';
+import 'package:tastyso_delivery_driver/main.dart';
+import 'package:tastyso_delivery_driver/util/dimensions.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_alert_dialog_widget.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:stackfood_multivendor_driver/util/images.dart';
+import 'package:tastyso_delivery_driver/util/images.dart';
 
 class DashboardScreen extends StatefulWidget {
   final int pageIndex;
@@ -170,16 +170,18 @@ class DashboardScreenState extends State<DashboardScreen> {
             padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
             child: Row(children: [
               BottomNavItemWidget(
+                  icon: Images.homeIcon,
+                  width: 23,
+                  height: 23,
+                  isSelected: _pageIndex == 0,
+                  onTap: () => _setPage(0)),
+              BottomNavItemWidget(
                   icon: Images.orderRequestIcon,
                   isSelected: _pageIndex == 1,
                   pageIndex: 1,
                   onTap: () {
                     _navigateRequestPage();
                   }),
-              BottomNavItemWidget(
-                  icon: Images.bengali,
-                  isSelected: _pageIndex == 0,
-                  onTap: () => _setPage(0)),
               BottomNavItemWidget(
                   icon: Images.runningOrderIcon,
                   isSelected: _pageIndex == 2,
@@ -190,6 +192,8 @@ class DashboardScreenState extends State<DashboardScreen> {
                   onTap: () => _setPage(3)),
               BottomNavItemWidget(
                   icon: Images.personIcon,
+                  width: 28,
+                  height: 28,
                   isSelected: _pageIndex == 4,
                   onTap: () => _setPage(4)),
             ]),

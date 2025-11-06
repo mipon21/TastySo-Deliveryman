@@ -1,6 +1,6 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:stackfood_multivendor_driver/util/dimensions.dart';
+import 'package:tastyso_delivery_driver/util/dimensions.dart';
 import 'package:video_player/video_player.dart';
 
 class ChatVideoView extends StatefulWidget {
@@ -16,7 +16,8 @@ class _ChatVideoViewState extends State<ChatVideoView> {
   ChewieController? _chewieController;
 
   Future<void> initializePlayer() async {
-    videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(widget.url));
+    videoPlayerController =
+        VideoPlayerController.networkUrl(Uri.parse(widget.url));
 
     await Future.wait([
       videoPlayerController.initialize(),
@@ -61,11 +62,14 @@ class _ChatVideoViewState extends State<ChatVideoView> {
         borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
         child: Stack(
           children: [
-            _chewieController != null &&  _chewieController!.videoPlayerController.value.isInitialized ? Stack(
-              children: [
-                Chewie(controller: _chewieController!),
-              ],
-            ) : const Center(child: CircularProgressIndicator()),
+            _chewieController != null &&
+                    _chewieController!.videoPlayerController.value.isInitialized
+                ? Stack(
+                    children: [
+                      Chewie(controller: _chewieController!),
+                    ],
+                  )
+                : const Center(child: CircularProgressIndicator()),
           ],
         ),
       ),

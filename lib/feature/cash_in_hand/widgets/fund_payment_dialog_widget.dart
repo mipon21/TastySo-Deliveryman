@@ -1,6 +1,6 @@
-import 'package:stackfood_multivendor_driver/util/dimensions.dart';
-import 'package:stackfood_multivendor_driver/util/images.dart';
-import 'package:stackfood_multivendor_driver/util/styles.dart';
+import 'package:tastyso_delivery_driver/util/dimensions.dart';
+import 'package:tastyso_delivery_driver/util/images.dart';
+import 'package:tastyso_delivery_driver/util/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,7 +10,8 @@ class FundPaymentDialogWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.radiusSmall)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Dimensions.radiusSmall)),
       insetPadding: const EdgeInsets.all(30),
       clipBehavior: Clip.antiAliasWithSaveLayer,
       child: SizedBox(
@@ -18,34 +19,42 @@ class FundPaymentDialogWidget extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-
             Padding(
               padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
               child: Image.asset(Images.warning, width: 70, height: 70),
             ),
-
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: Dimensions.paddingSizeLarge),
               child: Text(
-                'do_you_want_to_cancel_this_payment'.tr, textAlign: TextAlign.center,
-                style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraLarge, color: Theme.of(context).colorScheme.error),
+                'do_you_want_to_cancel_this_payment'.tr,
+                textAlign: TextAlign.center,
+                style: robotoMedium.copyWith(
+                    fontSize: Dimensions.fontSizeExtraLarge,
+                    color: Theme.of(context).colorScheme.error),
               ),
             ),
-
             TextButton(
               onPressed: () {
-                if(Get.isDialogOpen!){
+                if (Get.isDialogOpen!) {
                   Get.back();
                 }
                 Get.back();
               },
               style: TextButton.styleFrom(
-                backgroundColor: Theme.of(context).disabledColor.withValues(alpha: 0.3), minimumSize: const Size(Dimensions.webMaxWidth, 40), padding: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.radiusSmall)),
+                backgroundColor:
+                    Theme.of(context).disabledColor.withValues(alpha: 0.3),
+                minimumSize: const Size(Dimensions.webMaxWidth, 40),
+                padding: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(Dimensions.radiusSmall)),
               ),
-              child: Text('cancel_payment'.tr, textAlign: TextAlign.center, style: robotoBold.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color)),
+              child: Text('cancel_payment'.tr,
+                  textAlign: TextAlign.center,
+                  style: robotoBold.copyWith(
+                      color: Theme.of(context).textTheme.bodyLarge!.color)),
             ),
-
           ]),
         ),
       ),

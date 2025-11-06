@@ -1,20 +1,20 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
-import 'package:stackfood_multivendor_driver/common/models/response_model.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/custom_snackbar_widget.dart';
-import 'package:stackfood_multivendor_driver/feature/auth/controllers/auth_controller.dart';
-import 'package:stackfood_multivendor_driver/feature/profile/domain/models/profile_model.dart';
-import 'package:stackfood_multivendor_driver/feature/profile/domain/models/shift_model.dart';
-import 'package:stackfood_multivendor_driver/feature/profile/domain/services/profile_service_interface.dart';
-import 'package:stackfood_multivendor_driver/helper/route_helper.dart';
+import 'package:tastyso_delivery_driver/common/models/response_model.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_snackbar_widget.dart';
+import 'package:tastyso_delivery_driver/feature/auth/controllers/auth_controller.dart';
+import 'package:tastyso_delivery_driver/feature/profile/domain/models/profile_model.dart';
+import 'package:tastyso_delivery_driver/feature/profile/domain/models/shift_model.dart';
+import 'package:tastyso_delivery_driver/feature/profile/domain/services/profile_service_interface.dart';
+import 'package:tastyso_delivery_driver/helper/route_helper.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:stackfood_multivendor_driver/feature/profile/domain/models/record_location_body.dart';
+import 'package:tastyso_delivery_driver/feature/profile/domain/models/record_location_body.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileController extends GetxController implements GetxService {
   final ProfileServiceInterface profileServiceInterface;
-  ProfileController({required this.profileServiceInterface}){
+  ProfileController({required this.profileServiceInterface}) {
     _notification = profileServiceInterface.isNotificationActive();
   }
 
@@ -60,10 +60,12 @@ class ProfileController extends GetxController implements GetxService {
     update();
   }
 
-  Future<bool> updateUserInfo(ProfileModel updateUserModel, String token) async {
+  Future<bool> updateUserInfo(
+      ProfileModel updateUserModel, String token) async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await profileServiceInterface.updateProfile(updateUserModel, _pickedFile, token);
+    ResponseModel responseModel = await profileServiceInterface.updateProfile(
+        updateUserModel, _pickedFile, token);
     _isLoading = false;
     bool isSuccess;
     if (responseModel.isSuccess) {
@@ -80,10 +82,11 @@ class ProfileController extends GetxController implements GetxService {
 
   Future<bool> updateActiveStatus({int? shiftId, bool isUpdate = false}) async {
     _shiftLoading = true;
-    if(isUpdate){
+    if (isUpdate) {
       update();
     }
-    ResponseModel responseModel = await profileServiceInterface.updateActiveStatus(shiftId: shiftId);
+    ResponseModel responseModel =
+        await profileServiceInterface.updateActiveStatus(shiftId: shiftId);
     bool isSuccess;
     if (responseModel.isSuccess) {
       Get.back();
@@ -131,7 +134,7 @@ class ProfileController extends GetxController implements GetxService {
       Get.find<AuthController>().clearSharedData();
       stopLocationRecord();
       Get.offAllNamed(RouteHelper.getSignInRoute());
-    }else{
+    } else {
       Get.back();
       showCustomSnackBar(responseModel.message, isError: true);
     }
@@ -152,7 +155,7 @@ class ProfileController extends GetxController implements GetxService {
     update();
   }
 
-  void setShiftId(int? id){
+  void setShiftId(int? id) {
     _shiftId = id;
     update();
   }
@@ -175,18 +178,22 @@ class ProfileController extends GetxController implements GetxService {
 
   Future<void> recordLocation() async {
     final Position locationResult = await Geolocator.getCurrentPosition();
-    String address = await profileServiceInterface.addressPlaceMark(locationResult);
+    String address =
+        await profileServiceInterface.addressPlaceMark(locationResult);
 
     _recordLocation = RecordLocationBody(
-      location: address, latitude: locationResult.latitude, longitude: locationResult.longitude,
+      location: address,
+      latitude: locationResult.latitude,
+      longitude: locationResult.longitude,
     );
 
-    bool isSuccess  = await profileServiceInterface.recordLocation(_recordLocation!);
-    if(isSuccess) {
-      debugPrint('----Added record Lat: ${_recordLocation!.latitude} Lng: ${_recordLocation!.longitude} Loc: ${_recordLocation!.location}');
-    }else {
+    bool isSuccess =
+        await profileServiceInterface.recordLocation(_recordLocation!);
+    if (isSuccess) {
+      debugPrint(
+          '----Added record Lat: ${_recordLocation!.latitude} Lng: ${_recordLocation!.longitude} Loc: ${_recordLocation!.location}');
+    } else {
       debugPrint('----Failed record');
     }
   }
-
 }

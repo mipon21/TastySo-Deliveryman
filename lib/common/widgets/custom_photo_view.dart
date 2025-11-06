@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:stackfood_multivendor_driver/util/dimensions.dart';
+import 'package:tastyso_delivery_driver/util/dimensions.dart';
 
 class CustomPhotoView extends StatelessWidget {
   final String imageUrl;
@@ -10,7 +10,6 @@ class CustomPhotoView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
-
       ClipRRect(
         borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
         child: PhotoView(
@@ -19,13 +18,14 @@ class CustomPhotoView extends StatelessWidget {
           heroAttributes: PhotoViewHeroAttributes(tag: imageUrl),
         ),
       ),
-
-      Positioned(top: 0, right: 0, child: IconButton(
-        splashRadius: 5,
-        onPressed: () => Get.back(),
-        icon: const Icon(Icons.cancel, color: Colors.red),
-      )),
-
+      Positioned(
+          top: 0,
+          right: 0,
+          child: IconButton(
+            splashRadius: 5,
+            onPressed: () => Get.back(),
+            icon: const Icon(Icons.cancel, color: Colors.red),
+          )),
     ]);
   }
 }

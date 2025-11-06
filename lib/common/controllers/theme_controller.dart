@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:stackfood_multivendor_driver/util/app_constants.dart';
+import 'package:tastyso_delivery_driver/util/app_constants.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,8 +25,10 @@ class ThemeController extends GetxController implements GetxService {
   }
 
   void _loadCurrentTheme() async {
-    _lightMap = await rootBundle.loadString('assets/json/map_light_mode_style.json');
-    _darkMap = await rootBundle.loadString('assets/json/map_dark_mode_style.json');
+    _lightMap =
+        await rootBundle.loadString('assets/json/map_light_mode_style.json');
+    _darkMap =
+        await rootBundle.loadString('assets/json/map_dark_mode_style.json');
     _darkTheme = sharedPreferences.getBool(AppConstants.theme) ?? false;
     update();
   }

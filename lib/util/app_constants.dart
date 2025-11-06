@@ -1,13 +1,13 @@
-import 'package:stackfood_multivendor_driver/feature/language/domain/models/language_model.dart';
-import 'package:stackfood_multivendor_driver/util/images.dart';
+import 'package:tastyso_delivery_driver/feature/language/domain/models/language_model.dart';
+import 'package:tastyso_delivery_driver/util/images.dart';
 
 class AppConstants {
-  static const String appName = 'StackFood Delivery';
-  static const double appVersion = 8.3;
+  static const String appName = 'TastySo Delivery';
+  static const double appVersion = 1.0;
 
   ///Flutter SDK: 3.32.7
 
-  static const String baseUrl = 'https://stack.skylon-it.com';
+  static const String baseUrl = 'https://admin.tastysobd.com';
   static const String configUri = '/api/v1/config';
   static const String forgerPasswordUri =
       '/api/v1/auth/delivery-man/forgot-password';
@@ -79,7 +79,7 @@ class AppConstants {
 
   // Shared Key
   static const String theme = 'theme';
-  static const String token = 'stackfood_multivendor_driver_token';
+  static const String token = 'tastyso_delivery_driver_token';
   static const String countryCode = 'country_code';
   static const String languageCode = 'language_code';
   static const String cacheCountryCode = 'cache_country_code';
@@ -106,12 +106,12 @@ class AppConstants {
       countryCode: 'US',
       languageCode: 'en',
     ),
-    LanguageModel(
-      imageUrl: Images.bengali,
-      languageName: 'Bengali',
-      countryCode: 'BN',
-      languageCode: 'bn',
-    ),
+    // LanguageModel(
+    //   imageUrl: Images.bengali,
+    //   languageName: 'Bengali',
+    //   countryCode: 'BN',
+    //   languageCode: 'bn',
+    // ),
   ];
 
   static const double maxLimitOfFileSentINConversation = 25;

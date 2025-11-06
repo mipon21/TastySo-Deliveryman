@@ -1,6 +1,6 @@
-import 'package:stackfood_multivendor_driver/common/widgets/custom_card.dart';
-import 'package:stackfood_multivendor_driver/util/dimensions.dart';
-import 'package:stackfood_multivendor_driver/util/styles.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_card.dart';
+import 'package:tastyso_delivery_driver/util/dimensions.dart';
+import 'package:tastyso_delivery_driver/util/styles.dart';
 import 'package:flutter/material.dart';
 
 class ProfileCardWidget extends StatelessWidget {
@@ -10,19 +10,21 @@ class ProfileCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(child: CustomCard(
+    return Expanded(
+        child: CustomCard(
       height: 100,
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-
-        Text(data, style: robotoMedium.copyWith(
-          fontSize: Dimensions.fontSizeExtraLarge, color: Theme.of(context).primaryColor,
-        )),
+        Text(data,
+            style: robotoMedium.copyWith(
+              fontSize: Dimensions.fontSizeExtraLarge,
+              color: Theme.of(context).primaryColor,
+            )),
         const SizedBox(height: Dimensions.paddingSizeSmall),
-
-        Text(title, style: robotoRegular.copyWith(
-          fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor,
-        )),
-
+        Text(title,
+            style: robotoRegular.copyWith(
+              fontSize: Dimensions.fontSizeSmall,
+              color: Theme.of(context).hintColor,
+            )),
       ]),
     ));
   }

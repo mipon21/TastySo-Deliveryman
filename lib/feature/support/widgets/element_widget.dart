@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:stackfood_multivendor_driver/util/dimensions.dart';
-import 'package:stackfood_multivendor_driver/util/styles.dart';
+import 'package:tastyso_delivery_driver/util/dimensions.dart';
+import 'package:tastyso_delivery_driver/util/styles.dart';
 
 class ElementWidget extends StatelessWidget {
   final String image;
   final String title;
   final String subTitle;
   final Function() onTap;
-  const ElementWidget({super.key, required this.image, required this.title, required this.subTitle, required this.onTap});
+  const ElementWidget(
+      {super.key,
+      required this.image,
+      required this.title,
+      required this.subTitle,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -15,15 +20,16 @@ class ElementWidget extends StatelessWidget {
       onTap: onTap,
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Image.asset(image, height: 45, width: 45, fit: BoxFit.cover),
-
-        Text(title, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
-
+        Text(title,
+            style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
         Text(
           subTitle,
-          style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).disabledColor),
-          overflow: TextOverflow.ellipsis, maxLines: 2,
+          style: robotoMedium.copyWith(
+              fontSize: Dimensions.fontSizeDefault,
+              color: Theme.of(context).disabledColor),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 2,
         ),
-
       ]),
     );
   }

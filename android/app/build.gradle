@@ -30,7 +30,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "com.tastysobd.delivery"
+    namespace "com.tasty.so.delivery"
     compileSdkVersion 35
 
     compileOptions {
@@ -52,8 +52,8 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.tastysobd.delivery"
-        minSdkVersion 23
+        applicationId "com.tasty.so.delivery"
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

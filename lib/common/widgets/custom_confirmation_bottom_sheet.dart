@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/custom_button_widget.dart';
-import 'package:stackfood_multivendor_driver/feature/auth/controllers/auth_controller.dart';
-import 'package:stackfood_multivendor_driver/feature/order/controllers/order_controller.dart';
-import 'package:stackfood_multivendor_driver/feature/profile/controllers/profile_controller.dart';
-import 'package:stackfood_multivendor_driver/util/dimensions.dart';
-import 'package:stackfood_multivendor_driver/util/images.dart';
-import 'package:stackfood_multivendor_driver/util/styles.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_button_widget.dart';
+import 'package:tastyso_delivery_driver/feature/auth/controllers/auth_controller.dart';
+import 'package:tastyso_delivery_driver/feature/order/controllers/order_controller.dart';
+import 'package:tastyso_delivery_driver/feature/profile/controllers/profile_controller.dart';
+import 'package:tastyso_delivery_driver/util/dimensions.dart';
+import 'package:tastyso_delivery_driver/util/images.dart';
+import 'package:tastyso_delivery_driver/util/styles.dart';
 
 class CustomConfirmationBottomSheet extends StatelessWidget {
   final String? image;
@@ -15,7 +15,14 @@ class CustomConfirmationBottomSheet extends StatelessWidget {
   final String? confirmButtonText;
   final String? cancelButtonText;
   final Function onConfirm;
-  const CustomConfirmationBottomSheet({super.key, this.image, required this.title, this.description, this.confirmButtonText, this.cancelButtonText, required this.onConfirm});
+  const CustomConfirmationBottomSheet(
+      {super.key,
+      this.image,
+      required this.title,
+      this.description,
+      this.confirmButtonText,
+      this.cancelButtonText,
+      required this.onConfirm});
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +33,15 @@ class CustomConfirmationBottomSheet extends StatelessWidget {
             width: context.width,
             padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
             decoration: BoxDecoration(
-              color: Get.isDarkMode ? Theme.of(context).scaffoldBackgroundColor : Theme.of(context).cardColor,
+              color: Get.isDarkMode
+                  ? Theme.of(context).scaffoldBackgroundColor
+                  : Theme.of(context).cardColor,
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(Dimensions.radiusExtraLarge), topRight: Radius.circular(Dimensions.radiusExtraLarge),
+                topLeft: Radius.circular(Dimensions.radiusExtraLarge),
+                topRight: Radius.circular(Dimensions.radiusExtraLarge),
               ),
             ),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-
               Align(
                 alignment: Alignment.topRight,
                 child: InkWell(
@@ -40,7 +49,8 @@ class CustomConfirmationBottomSheet extends StatelessWidget {
                     Get.back();
                   },
                   child: Container(
-                    height: 30, width: 30,
+                    height: 30,
+                    width: 30,
                     padding: EdgeInsets.all(3),
                     decoration: BoxDecoration(
                       color: Theme.of(context).disabledColor,
@@ -50,28 +60,32 @@ class CustomConfirmationBottomSheet extends StatelessWidget {
                   ),
                 ),
               ),
-
               Image.asset(
-                image ?? Images.warning, height: 60, width: 60,
+                image ?? Images.warning,
+                height: 60,
+                width: 60,
               ),
               const SizedBox(height: Dimensions.paddingSizeLarge),
-
-              Text(title, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge), textAlign: TextAlign.center),
+              Text(title,
+                  style:
+                      robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge),
+                  textAlign: TextAlign.center),
               const SizedBox(height: Dimensions.paddingSizeDefault),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 35),
                 child: Text(
                   description ?? '',
-                  style: robotoRegular.copyWith(color: Theme.of(context).hintColor), textAlign: TextAlign.center,
+                  style: robotoRegular.copyWith(
+                      color: Theme.of(context).hintColor),
+                  textAlign: TextAlign.center,
                 ),
               ),
               const SizedBox(height: 30),
-
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeLarge),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: Dimensions.paddingSizeSmall,
+                    vertical: Dimensions.paddingSizeLarge),
                 child: Row(children: [
-
                   Expanded(
                     child: CustomButtonWidget(
                       onPressed: () {
@@ -83,21 +97,20 @@ class CustomConfirmationBottomSheet extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: Dimensions.paddingSizeDefault),
-
                   Expanded(
                     child: CustomButtonWidget(
                       onPressed: () => onConfirm(),
-                      isLoading: orderController.isLoading || authController.isLoading || profileController.isLoading || profileController.shiftLoading,
+                      isLoading: orderController.isLoading ||
+                          authController.isLoading ||
+                          profileController.isLoading ||
+                          profileController.shiftLoading,
                       buttonText: confirmButtonText ?? 'accept'.tr,
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                   ),
-
                 ]),
               ),
-
             ]),
-
           );
         });
       });

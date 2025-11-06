@@ -1,24 +1,24 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:stackfood_multivendor_driver/feature/auth/controllers/auth_controller.dart';
-import 'package:stackfood_multivendor_driver/feature/language/controllers/localization_controller.dart';
-import 'package:stackfood_multivendor_driver/feature/splash/controllers/splash_controller.dart';
-import 'package:stackfood_multivendor_driver/common/controllers/theme_controller.dart';
-import 'package:stackfood_multivendor_driver/feature/notification/domain/models/notification_body_model.dart';
-import 'package:stackfood_multivendor_driver/helper/notification_helper.dart';
-import 'package:stackfood_multivendor_driver/helper/route_helper.dart';
-import 'package:stackfood_multivendor_driver/theme/dark_theme.dart';
-import 'package:stackfood_multivendor_driver/theme/light_theme.dart';
-import 'package:stackfood_multivendor_driver/util/app_constants.dart';
-import 'package:stackfood_multivendor_driver/util/messages.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:url_strategy/url_strategy.dart';
+import 'common/controllers/theme_controller.dart';
+import 'feature/auth/controllers/auth_controller.dart';
+import 'feature/language/controllers/localization_controller.dart';
+import 'feature/notification/domain/models/notification_body_model.dart';
+import 'feature/splash/controllers/splash_controller.dart';
 import 'helper/get_di.dart' as di;
 import 'firebase_options.dart';
+import 'helper/notification_helper.dart';
+import 'helper/route_helper.dart';
+import 'theme/dark_theme.dart';
+import 'theme/light_theme.dart';
+import 'util/app_constants.dart';
+import 'util/messages.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/details_custom_card.dart';
-import 'package:stackfood_multivendor_driver/util/dimensions.dart';
-import 'package:stackfood_multivendor_driver/util/styles.dart';
+import 'package:tastyso_delivery_driver/common/widgets/details_custom_card.dart';
+import 'package:tastyso_delivery_driver/util/dimensions.dart';
+import 'package:tastyso_delivery_driver/util/styles.dart';
 import 'package:flutter/material.dart';
 
 class ProfileButtonWidget extends StatelessWidget {
@@ -9,7 +9,12 @@ class ProfileButtonWidget extends StatelessWidget {
   final String title;
   final bool? isButtonActive;
   final Function onTap;
-  const ProfileButtonWidget({super.key, required this.icon, required this.title, required this.onTap, this.isButtonActive});
+  const ProfileButtonWidget(
+      {super.key,
+      required this.icon,
+      required this.title,
+      required this.onTap,
+      this.isButtonActive});
 
   @override
   Widget build(BuildContext context) {
@@ -21,19 +26,18 @@ class ProfileButtonWidget extends StatelessWidget {
           vertical: isButtonActive != null ? 8 : Dimensions.paddingSizeDefault,
         ),
         child: Row(children: [
-
           Icon(icon, size: 25),
           const SizedBox(width: Dimensions.paddingSizeSmall),
-
           Expanded(child: Text(title, style: robotoRegular)),
-
-          isButtonActive != null ? CupertinoSwitch(
-            value: isButtonActive!,
-            onChanged: (bool isActive) => onTap(),
-            activeTrackColor: Theme.of(context).primaryColor,
-            inactiveTrackColor: Theme.of(context).disabledColor.withValues(alpha: 0.5),
-          ) : const SizedBox(),
-
+          isButtonActive != null
+              ? CupertinoSwitch(
+                  value: isButtonActive!,
+                  onChanged: (bool isActive) => onTap(),
+                  activeTrackColor: Theme.of(context).primaryColor,
+                  inactiveTrackColor:
+                      Theme.of(context).disabledColor.withValues(alpha: 0.5),
+                )
+              : const SizedBox(),
         ]),
       ),
     );

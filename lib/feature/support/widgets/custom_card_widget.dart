@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stackfood_multivendor_driver/util/dimensions.dart';
+import 'package:tastyso_delivery_driver/util/dimensions.dart';
 
 class CustomCardWidget extends StatelessWidget {
   final Widget child;
@@ -18,9 +18,9 @@ class CustomCardWidget extends StatelessWidget {
               Theme.of(context).primaryColor.withValues(alpha: 0.5),
               Theme.of(context).primaryColor,
             ],
-            begin: Alignment.topCenter, end: Alignment.bottomCenter,
-          )
-      ),
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          )),
       padding: const EdgeInsets.all(1),
       child: Container(
         height: 130,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stackfood_multivendor_driver/feature/language/domain/models/language_model.dart';
+import 'package:tastyso_delivery_driver/feature/language/domain/models/language_model.dart';
 
 abstract class LanguageServiceInterface {
   bool setLTR(Locale locale);

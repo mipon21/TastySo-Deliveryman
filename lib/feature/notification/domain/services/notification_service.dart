@@ -1,8 +1,8 @@
-import 'package:stackfood_multivendor_driver/feature/notification/domain/models/notification_model.dart';
-import 'package:stackfood_multivendor_driver/feature/notification/domain/repositories/notification_repository_interface.dart';
-import 'package:stackfood_multivendor_driver/feature/notification/domain/services/notification_service_interface.dart';
+import 'package:tastyso_delivery_driver/feature/notification/domain/models/notification_model.dart';
+import 'package:tastyso_delivery_driver/feature/notification/domain/repositories/notification_repository_interface.dart';
+import 'package:tastyso_delivery_driver/feature/notification/domain/services/notification_service_interface.dart';
 
-class NotificationService implements NotificationServiceInterface{
+class NotificationService implements NotificationServiceInterface {
   final NotificationRepositoryInterface notificationRepositoryInterface;
   NotificationService({required this.notificationRepositoryInterface});
 
@@ -13,7 +13,8 @@ class NotificationService implements NotificationServiceInterface{
 
   @override
   Future<bool> sendDeliveredNotification(int? orderID) async {
-    return await notificationRepositoryInterface.sendDeliveredNotification(orderID);
+    return await notificationRepositoryInterface
+        .sendDeliveredNotification(orderID);
   }
 
   @override
@@ -35,5 +36,4 @@ class NotificationService implements NotificationServiceInterface{
   void addSeenNotificationIdList(List<int> notificationList) {
     notificationRepositoryInterface.addSeenNotificationIdList(notificationList);
   }
-
 }

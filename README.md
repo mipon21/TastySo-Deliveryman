@@ -1,4 +1,4 @@
-# stackfood_multivendor_driver
+# tastyso_delivery_driver
 
 A new Flutter application.
 

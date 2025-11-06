@@ -1,21 +1,24 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:stackfood_multivendor_driver/common/models/response_model.dart';
-import 'package:stackfood_multivendor_driver/api/api_client.dart';
-import 'package:stackfood_multivendor_driver/feature/cash_in_hand/domain/models/wallet_payment_model.dart';
-import 'package:stackfood_multivendor_driver/feature/cash_in_hand/domain/repositories/cash_in_hand_repository_interface.dart';
-import 'package:stackfood_multivendor_driver/helper/route_helper.dart';
-import 'package:stackfood_multivendor_driver/util/app_constants.dart';
+import 'package:tastyso_delivery_driver/common/models/response_model.dart';
+import 'package:tastyso_delivery_driver/api/api_client.dart';
+import 'package:tastyso_delivery_driver/feature/cash_in_hand/domain/models/wallet_payment_model.dart';
+import 'package:tastyso_delivery_driver/feature/cash_in_hand/domain/repositories/cash_in_hand_repository_interface.dart';
+import 'package:tastyso_delivery_driver/helper/route_helper.dart';
+import 'package:tastyso_delivery_driver/util/app_constants.dart';
 
 class CashInHandRepository implements CashInHandRepositoryInterface {
   final ApiClient apiClient;
   final SharedPreferences sharedPreferences;
-  CashInHandRepository({required this.apiClient, required this.sharedPreferences});
+  CashInHandRepository(
+      {required this.apiClient, required this.sharedPreferences});
 
   @override
-  Future<ResponseModel> makeCollectCashPayment(double amount, String paymentGatewayName) async {
+  Future<ResponseModel> makeCollectCashPayment(
+      double amount, String paymentGatewayName) async {
     ResponseModel responseModel;
-    Response response = await apiClient.postData(AppConstants.makeCollectedCashPaymentUri, {
+    Response response =
+        await apiClient.postData(AppConstants.makeCollectedCashPaymentUri, {
       "amount": amount,
       "payment_gateway": paymentGatewayName,
       "callback": RouteHelper.success,
@@ -24,9 +27,9 @@ class CashInHandRepository implements CashInHandRepositoryInterface {
     if (response.statusCode == 200) {
       String redirectUrl = response.body['redirect_link'];
       Get.back();
-      if(GetPlatform.isWeb) {
+      if (GetPlatform.isWeb) {
         // html.window.open(redirectUrl,"_self");
-      } else{
+      } else {
         Get.toNamed(RouteHelper.getPaymentRoute(redirectUrl));
       }
       responseModel = ResponseModel(true, response.body.toString());
@@ -39,10 +42,12 @@ class CashInHandRepository implements CashInHandRepositoryInterface {
   @override
   Future<ResponseModel> makeWalletAdjustment() async {
     ResponseModel responseModel;
-    Response response = await apiClient.postData(AppConstants.makeWalletAdjustmentUri, {'token': _getUserToken()}, handleError: false);
-    if(response.statusCode == 200) {
+    Response response = await apiClient.postData(
+        AppConstants.makeWalletAdjustmentUri, {'token': _getUserToken()},
+        handleError: false);
+    if (response.statusCode == 200) {
       responseModel = ResponseModel(true, 'wallet_adjustment_successfully'.tr);
-    }else {
+    } else {
       responseModel = ResponseModel(false, response.statusText);
     }
     return responseModel;
@@ -51,10 +56,12 @@ class CashInHandRepository implements CashInHandRepositoryInterface {
   @override
   Future<List<Transactions>?> getList() async {
     List<Transactions>? transactions;
-    Response response = await apiClient.getData('${AppConstants.walletPaymentListUri}?token=${_getUserToken()}');
-    if(response.statusCode == 200) {
+    Response response = await apiClient.getData(
+        '${AppConstants.walletPaymentListUri}?token=${_getUserToken()}');
+    if (response.statusCode == 200) {
       transactions = [];
-      WalletPaymentModel walletPaymentModel = WalletPaymentModel.fromJson(response.body);
+      WalletPaymentModel walletPaymentModel =
+          WalletPaymentModel.fromJson(response.body);
       transactions.addAll(walletPaymentModel.transactions!);
     }
     return transactions;
@@ -83,5 +90,4 @@ class CashInHandRepository implements CashInHandRepositoryInterface {
   Future update(Map<String, dynamic> body) {
     throw UnimplementedError();
   }
-
 }

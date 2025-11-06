@@ -1,27 +1,27 @@
 import 'package:permission_handler/permission_handler.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/custom_alert_dialog_widget.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/custom_bottom_sheet_widget.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/custom_card.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/custom_confirmation_bottom_sheet.dart';
-import 'package:stackfood_multivendor_driver/feature/home/widgets/order_count_card_widget.dart';
-import 'package:stackfood_multivendor_driver/feature/notification/controllers/notification_controller.dart';
-import 'package:stackfood_multivendor_driver/feature/order/controllers/order_controller.dart';
-import 'package:stackfood_multivendor_driver/feature/home/widgets/count_card_widget.dart';
-import 'package:stackfood_multivendor_driver/feature/home/widgets/earning_widget.dart';
-import 'package:stackfood_multivendor_driver/feature/home/widgets/shift_dialogue_widget.dart';
-import 'package:stackfood_multivendor_driver/feature/order/screens/running_order_screen.dart';
-import 'package:stackfood_multivendor_driver/feature/profile/controllers/profile_controller.dart';
-import 'package:stackfood_multivendor_driver/helper/price_converter_helper.dart';
-import 'package:stackfood_multivendor_driver/helper/route_helper.dart';
-import 'package:stackfood_multivendor_driver/util/color_resources.dart';
-import 'package:stackfood_multivendor_driver/util/dimensions.dart';
-import 'package:stackfood_multivendor_driver/util/images.dart';
-import 'package:stackfood_multivendor_driver/util/styles.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/custom_button_widget.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/custom_snackbar_widget.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/order_shimmer_widget.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/order_widget.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/title_widget.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_alert_dialog_widget.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_bottom_sheet_widget.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_card.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_confirmation_bottom_sheet.dart';
+import 'package:tastyso_delivery_driver/feature/home/widgets/order_count_card_widget.dart';
+import 'package:tastyso_delivery_driver/feature/notification/controllers/notification_controller.dart';
+import 'package:tastyso_delivery_driver/feature/order/controllers/order_controller.dart';
+import 'package:tastyso_delivery_driver/feature/home/widgets/count_card_widget.dart';
+import 'package:tastyso_delivery_driver/feature/home/widgets/earning_widget.dart';
+import 'package:tastyso_delivery_driver/feature/home/widgets/shift_dialogue_widget.dart';
+import 'package:tastyso_delivery_driver/feature/order/screens/running_order_screen.dart';
+import 'package:tastyso_delivery_driver/feature/profile/controllers/profile_controller.dart';
+import 'package:tastyso_delivery_driver/helper/price_converter_helper.dart';
+import 'package:tastyso_delivery_driver/helper/route_helper.dart';
+import 'package:tastyso_delivery_driver/util/color_resources.dart';
+import 'package:tastyso_delivery_driver/util/dimensions.dart';
+import 'package:tastyso_delivery_driver/util/images.dart';
+import 'package:tastyso_delivery_driver/util/styles.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_button_widget.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_snackbar_widget.dart';
+import 'package:tastyso_delivery_driver/common/widgets/order_shimmer_widget.dart';
+import 'package:tastyso_delivery_driver/common/widgets/order_widget.dart';
+import 'package:tastyso_delivery_driver/common/widgets/title_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:geolocator/geolocator.dart';
@@ -152,12 +152,16 @@ class _HomeScreenState extends State<HomeScreen> {
         surfaceTintColor: Theme.of(context).cardColor,
         shadowColor: Theme.of(context).disabledColor.withValues(alpha: 0.5),
         elevation: 2,
-        leading: Padding(
-          padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-          child: Image.asset(Images.logo, height: 30, width: 30),
-        ),
+        // leading: Padding(
+        //   padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+        //   child: Image.asset(Images.logo, height: 30, width: 30),
+        // ),
         titleSpacing: 0,
-        title: Image.asset(Images.logoName, width: 120),
+        title: Padding(
+          padding:
+              const EdgeInsets.only(left: Dimensions.paddingSizeSmall * 1.5),
+          child: Image.asset(Images.logoName, width: 200),
+        ),
         actions: [
           IconButton(
             icon: GetBuilder<NotificationController>(
@@ -286,9 +290,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 child:
                     GetBuilder<ProfileController>(builder: (profileController) {
                   return Column(children: [
-                    SizedBox(
-                      height: 100,
-                    ),
                     GetBuilder<OrderController>(builder: (orderController) {
                       bool hasActiveOrder =
                           orderController.currentOrderList == null ||
@@ -459,19 +460,19 @@ class _HomeScreenState extends State<HomeScreen> {
                               backgroundColor: Theme.of(context)
                                   .secondaryHeaderColor
                                   .withValues(alpha: 0.2),
-                              height: 180,
+                              height: 50,
                               value: profileController
                                   .profileModel?.todaysOrderCount
                                   .toString(),
                             ),
-                            const SizedBox(width: Dimensions.paddingSizeSmall),
+                            const SizedBox(height: Dimensions.paddingSizeSmall),
                             CountCardWidget(
                               title: 'this_week_orders'.tr,
                               backgroundColor: Theme.of(context)
                                   .colorScheme
                                   .error
                                   .withValues(alpha: 0.2),
-                              height: 180,
+                              height: 50,
                               value: profileController
                                   .profileModel?.thisWeekOrderCount
                                   .toString(),
@@ -482,7 +483,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               backgroundColor: Theme.of(context)
                                   .primaryColor
                                   .withValues(alpha: 0.2),
-                              height: 140,
+                              height: 50,
                               value: profileController.profileModel?.orderCount
                                   .toString(),
                             ),

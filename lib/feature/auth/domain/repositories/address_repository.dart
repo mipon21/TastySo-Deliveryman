@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:stackfood_multivendor_driver/api/api_client.dart';
-import 'package:stackfood_multivendor_driver/feature/auth/domain/models/zone_model.dart';
-import 'package:stackfood_multivendor_driver/feature/auth/domain/repositories/address_repository_interface.dart';
-import 'package:stackfood_multivendor_driver/util/app_constants.dart';
+import 'package:tastyso_delivery_driver/api/api_client.dart';
+import 'package:tastyso_delivery_driver/feature/auth/domain/models/zone_model.dart';
+import 'package:tastyso_delivery_driver/feature/auth/domain/repositories/address_repository_interface.dart';
+import 'package:tastyso_delivery_driver/util/app_constants.dart';
 
 class AddressRepository implements AddressRepositoryInterface {
   final ApiClient apiClient;
@@ -11,7 +11,7 @@ class AddressRepository implements AddressRepositoryInterface {
   AddressRepository({required this.apiClient, required this.sharedPreferences});
 
   @override
-  Future<List<ZoneModel>?> getList() async{
+  Future<List<ZoneModel>?> getList() async {
     List<ZoneModel>? zoneList;
     Response response = await apiClient.getData(AppConstants.zoneListUri);
     if (response.statusCode == 200) {
@@ -30,7 +30,6 @@ class AddressRepository implements AddressRepositoryInterface {
   String? getUserAddress() {
     return sharedPreferences.getString(AppConstants.userAddress);
   }
-
 
   @override
   Future<bool> saveUserAddress(String address) async {
@@ -60,5 +59,4 @@ class AddressRepository implements AddressRepositoryInterface {
   Future update(Map<String, dynamic> body) {
     throw UnimplementedError();
   }
-
 }

@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.tastysobd.delivery">
+    package="com.tasty.so.delivery">
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -31,8 +31,8 @@
     <application
         tools:replace="android:label"
         android:name="${applicationName}"
-        android:label="StackFood Delivery"
-        android:icon="@mipmap/ic_launcher"
+        android:label="TastySo Delivery"
+        android:icon="@mipmap/launcher_icon"
         android:extractNativeLibs="true"
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true">

@@ -1,6 +1,6 @@
-import 'package:stackfood_multivendor_driver/feature/language/domain/models/language_model.dart';
-import 'package:stackfood_multivendor_driver/feature/language/domain/repositories/language_repository_interface.dart';
-import 'package:stackfood_multivendor_driver/feature/language/domain/services/language_service_interface.dart';
+import 'package:tastyso_delivery_driver/feature/language/domain/models/language_model.dart';
+import 'package:tastyso_delivery_driver/feature/language/domain/repositories/language_repository_interface.dart';
+import 'package:tastyso_delivery_driver/feature/language/domain/services/language_service_interface.dart';
 import 'package:flutter/material.dart';
 
 class LanguageService implements LanguageServiceInterface {
@@ -10,9 +10,9 @@ class LanguageService implements LanguageServiceInterface {
   @override
   bool setLTR(Locale locale) {
     bool isLtr = true;
-    if(locale.languageCode == 'ar') {
+    if (locale.languageCode == 'ar') {
       isLtr = false;
-    }else {
+    } else {
       isLtr = true;
     }
     return isLtr;
@@ -31,8 +31,8 @@ class LanguageService implements LanguageServiceInterface {
   @override
   int setSelectedLanguageIndex(List<LanguageModel> languages, Locale locale) {
     int selectedLanguageIndex = 0;
-    for(int index = 0; index<languages.length; index++) {
-      if(languages[index].languageCode == locale.languageCode) {
+    for (int index = 0; index < languages.length; index++) {
+      if (languages[index].languageCode == locale.languageCode) {
         selectedLanguageIndex = index;
         break;
       }
@@ -54,5 +54,4 @@ class LanguageService implements LanguageServiceInterface {
   Locale getCacheLocaleFromSharedPref() {
     return languageRepositoryInterface.getCacheLocaleFromSharedPref();
   }
-
 }

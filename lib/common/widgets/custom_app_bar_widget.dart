@@ -1,26 +1,40 @@
 import 'package:get/get.dart';
-import 'package:stackfood_multivendor_driver/util/dimensions.dart';
-import 'package:stackfood_multivendor_driver/util/styles.dart';
+import 'package:tastyso_delivery_driver/util/dimensions.dart';
+import 'package:tastyso_delivery_driver/util/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_utils/get_utils.dart';
 
-class CustomAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
+class CustomAppBarWidget extends StatelessWidget
+    implements PreferredSizeWidget {
   final String title;
   final bool isBackButtonExist;
   final Function? onBackPressed;
   final Widget? actionWidget;
-  const CustomAppBarWidget({super.key, required this.title, this.isBackButtonExist = true, this.onBackPressed, this.actionWidget});
+  const CustomAppBarWidget(
+      {super.key,
+      required this.title,
+      this.isBackButtonExist = true,
+      this.onBackPressed,
+      this.actionWidget});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(title, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, fontWeight: FontWeight.w600, color: Theme.of(context).textTheme.bodyLarge!.color)),
+      title: Text(title,
+          style: robotoMedium.copyWith(
+              fontSize: Dimensions.fontSizeLarge,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).textTheme.bodyLarge!.color)),
       centerTitle: true,
-      leading: isBackButtonExist ? IconButton(
-        icon: const Icon(Icons.arrow_back_ios),
-        color: Theme.of(context).textTheme.bodyLarge!.color,
-        onPressed: () => onBackPressed != null ? onBackPressed!() : Navigator.pop(context),
-      ) : const SizedBox(),
+      leading: isBackButtonExist
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back_ios),
+              color: Theme.of(context).textTheme.bodyLarge!.color,
+              onPressed: () => onBackPressed != null
+                  ? onBackPressed!()
+                  : Navigator.pop(context),
+            )
+          : const SizedBox(),
       backgroundColor: Theme.of(context).cardColor,
       surfaceTintColor: Theme.of(context).cardColor,
       shadowColor: Theme.of(context).disabledColor.withValues(alpha: 0.5),

@@ -1,4 +1,4 @@
-import 'package:stackfood_multivendor_driver/feature/auth/domain/models/zone_response_model.dart';
+import 'package:tastyso_delivery_driver/feature/auth/domain/models/zone_response_model.dart';
 
 class AddressModel {
   int? id;

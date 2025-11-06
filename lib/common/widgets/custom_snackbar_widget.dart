@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/custom_toast.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_toast.dart';
 
 Future<void> showCustomSnackBar(String? message, {bool isError = true}) async {
-  if(message != null && message.isNotEmpty) {
-
+  if (message != null && message.isNotEmpty) {
     Get.closeCurrentSnackbar();
     Get.showSnackbar(GetSnackBar(
       snackPosition: SnackPosition.BOTTOM,
@@ -21,6 +20,5 @@ Future<void> showCustomSnackBar(String? message, {bool isError = true}) async {
       reverseAnimationCurve: Curves.fastEaseInToSlowEaseOut,
       animationDuration: const Duration(milliseconds: 500),
     ));
-
   }
 }

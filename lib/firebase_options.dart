@@ -50,19 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCcrW1bG1wrIhvQT9K5dtgBHE_2O2AU7lI',
-    appId: '1:866971833093:android:7c2608d55ecfd9cae45d6c',
-    messagingSenderId: '866971833093',
-    projectId: 'ahilo-5ab21',
-    storageBucket: 'ahilo-5ab21.firebasestorage.app',
+    apiKey: 'AIzaSyApXe5G89-aa-mmsmWCZKND_tG58MXoZ_4',
+    appId: '1:642209055318:android:3f52fe1e2f41e35e6b31f7',
+    messagingSenderId: '642209055318',
+    projectId: 'tastyso',
+    storageBucket: 'tastyso.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDCdrlbXCxz3Dt9T5R0P-5TM3ldOhjCLx8',
-    appId: '1:866971833093:ios:67327dd7c83adbd7e45d6c',
-    messagingSenderId: '866971833093',
-    projectId: 'ahilo-5ab21',
-    storageBucket: 'ahilo-5ab21.firebasestorage.app',
-    iosBundleId: 'com.tastysobd.delivery',
+    apiKey: 'AIzaSyClq2Z921iHOdKn8QmhhMUDJAAGlulqpWI',
+    appId: '1:642209055318:ios:881d5e977a044e346b31f7',
+    messagingSenderId: '642209055318',
+    projectId: 'tastyso',
+    storageBucket: 'tastyso.firebasestorage.app',
+    iosBundleId: 'com.tasty.so.delivery',
   );
+
 }

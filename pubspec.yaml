@@ -1,4 +1,4 @@
-name: stackfood_multivendor_driver
+name: tastyso_delivery_driver
 description: A new Flutter application.
 publish_to: 'none' #
 version: 1.0.0+1
@@ -51,6 +51,8 @@ dependencies:
   just_the_tooltip: ^0.0.12
   change_app_package_name: ^1.5.0
   lottie: ^3.3.1
+  flutter_native_splash: ^2.4.6
+  flutter_launcher_icons: ^0.14.4
 
 
 dependency_overrides:
@@ -68,6 +70,7 @@ flutter:
 
   assets:
     - assets/image/
+    - assets/image/logo/
     - assets/language/
     - assets/notification.mp3
     - assets/json/

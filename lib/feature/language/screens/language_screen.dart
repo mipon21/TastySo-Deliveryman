@@ -1,14 +1,14 @@
-import 'package:stackfood_multivendor_driver/feature/language/controllers/localization_controller.dart';
-import 'package:stackfood_multivendor_driver/feature/language/widgets/language_card_widget.dart';
-import 'package:stackfood_multivendor_driver/feature/splash/controllers/splash_controller.dart';
-import 'package:stackfood_multivendor_driver/helper/route_helper.dart';
-import 'package:stackfood_multivendor_driver/util/styles.dart';
+import 'package:tastyso_delivery_driver/feature/language/controllers/localization_controller.dart';
+import 'package:tastyso_delivery_driver/feature/language/widgets/language_card_widget.dart';
+import 'package:tastyso_delivery_driver/feature/splash/controllers/splash_controller.dart';
+import 'package:tastyso_delivery_driver/helper/route_helper.dart';
+import 'package:tastyso_delivery_driver/util/styles.dart';
 import 'package:flutter/material.dart';
-import 'package:stackfood_multivendor_driver/util/app_constants.dart';
-import 'package:stackfood_multivendor_driver/util/dimensions.dart';
-import 'package:stackfood_multivendor_driver/util/images.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/custom_button_widget.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/custom_snackbar_widget.dart';
+import 'package:tastyso_delivery_driver/util/app_constants.dart';
+import 'package:tastyso_delivery_driver/util/dimensions.dart';
+import 'package:tastyso_delivery_driver/util/images.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_button_widget.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_snackbar_widget.dart';
 import 'package:get/get.dart';
 
 class ChooseLanguageScreen extends StatelessWidget {

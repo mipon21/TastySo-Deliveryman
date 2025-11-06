@@ -1,23 +1,28 @@
-import 'package:stackfood_multivendor_driver/api/api_client.dart';
-import 'package:stackfood_multivendor_driver/feature/language/domain/repositories/language_repository_interface.dart';
-import 'package:stackfood_multivendor_driver/util/app_constants.dart';
+import 'package:tastyso_delivery_driver/api/api_client.dart';
+import 'package:tastyso_delivery_driver/feature/language/domain/repositories/language_repository_interface.dart';
+import 'package:tastyso_delivery_driver/util/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LanguageRepository implements LanguageRepositoryInterface {
   final ApiClient apiClient;
   final SharedPreferences sharedPreferences;
-  LanguageRepository({required this.apiClient, required this.sharedPreferences});
+  LanguageRepository(
+      {required this.apiClient, required this.sharedPreferences});
 
   @override
   void updateHeader(Locale locale) {
-    apiClient.updateHeader(sharedPreferences.getString(AppConstants.token), locale.languageCode);
+    apiClient.updateHeader(
+        sharedPreferences.getString(AppConstants.token), locale.languageCode);
   }
 
   @override
   Locale getLocaleFromSharedPref() {
-    return Locale(sharedPreferences.getString(AppConstants.languageCode) ?? AppConstants.languages[0].languageCode!,
-        sharedPreferences.getString(AppConstants.countryCode) ?? AppConstants.languages[0].countryCode);
+    return Locale(
+        sharedPreferences.getString(AppConstants.languageCode) ??
+            AppConstants.languages[0].languageCode!,
+        sharedPreferences.getString(AppConstants.countryCode) ??
+            AppConstants.languages[0].countryCode);
   }
 
   @override
@@ -28,14 +33,19 @@ class LanguageRepository implements LanguageRepositoryInterface {
 
   @override
   void saveCacheLanguage(Locale locale) {
-    sharedPreferences.setString(AppConstants.cacheLanguageCode, locale.languageCode);
-    sharedPreferences.setString(AppConstants.cacheCountryCode, locale.countryCode!);
+    sharedPreferences.setString(
+        AppConstants.cacheLanguageCode, locale.languageCode);
+    sharedPreferences.setString(
+        AppConstants.cacheCountryCode, locale.countryCode!);
   }
 
   @override
   Locale getCacheLocaleFromSharedPref() {
-    return Locale(sharedPreferences.getString(AppConstants.cacheLanguageCode) ?? AppConstants.languages[0].languageCode!,
-        sharedPreferences.getString(AppConstants.cacheCountryCode) ?? AppConstants.languages[0].countryCode);
+    return Locale(
+        sharedPreferences.getString(AppConstants.cacheLanguageCode) ??
+            AppConstants.languages[0].languageCode!,
+        sharedPreferences.getString(AppConstants.cacheCountryCode) ??
+            AppConstants.languages[0].countryCode);
   }
 
   @override
@@ -62,5 +72,4 @@ class LanguageRepository implements LanguageRepositoryInterface {
   Future update(Map<String, dynamic> body) {
     throw UnimplementedError();
   }
-
 }

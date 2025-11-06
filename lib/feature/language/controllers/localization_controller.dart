@@ -1,16 +1,17 @@
-import 'package:stackfood_multivendor_driver/feature/language/domain/services/language_service_interface.dart';
-import 'package:stackfood_multivendor_driver/feature/language/domain/models/language_model.dart';
-import 'package:stackfood_multivendor_driver/util/app_constants.dart';
+import 'package:tastyso_delivery_driver/feature/language/domain/services/language_service_interface.dart';
+import 'package:tastyso_delivery_driver/feature/language/domain/models/language_model.dart';
+import 'package:tastyso_delivery_driver/util/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class LocalizationController extends GetxController implements GetxService {
   final LanguageServiceInterface languageServiceInterface;
-  LocalizationController({required this.languageServiceInterface}){
+  LocalizationController({required this.languageServiceInterface}) {
     loadCurrentLanguage();
   }
 
-  Locale _locale = Locale(AppConstants.languages[0].languageCode!, AppConstants.languages[0].countryCode);
+  Locale _locale = Locale(AppConstants.languages[0].languageCode!,
+      AppConstants.languages[0].countryCode);
   Locale get locale => _locale;
 
   bool _isLtr = true;
@@ -27,7 +28,7 @@ class LocalizationController extends GetxController implements GetxService {
     _locale = locale;
     _isLtr = languageServiceInterface.setLTR(_locale);
     languageServiceInterface.updateHeader(_locale);
-    if(!fromBottomSheet) {
+    if (!fromBottomSheet) {
       saveLanguage(_locale);
     }
     update();
@@ -36,14 +37,16 @@ class LocalizationController extends GetxController implements GetxService {
   void loadCurrentLanguage() async {
     _locale = languageServiceInterface.getLocaleFromSharedPref();
     _isLtr = _locale.languageCode != 'ar';
-    _selectedLanguageIndex = languageServiceInterface.setSelectedLanguageIndex(AppConstants.languages, _locale);
+    _selectedLanguageIndex = languageServiceInterface.setSelectedLanguageIndex(
+        AppConstants.languages, _locale);
     _languages = [];
     _languages.addAll(AppConstants.languages);
     update();
   }
 
   void saveCacheLanguage(Locale? locale) {
-    languageServiceInterface.saveCacheLanguage(locale ?? languageServiceInterface.getLocaleFromSharedPref());
+    languageServiceInterface.saveCacheLanguage(
+        locale ?? languageServiceInterface.getLocaleFromSharedPref());
   }
 
   void saveLanguage(Locale locale) async {
@@ -61,10 +64,11 @@ class LocalizationController extends GetxController implements GetxService {
 
   void searchSelectedLanguage() {
     for (var language in AppConstants.languages) {
-      if (language.languageCode!.toLowerCase().contains(_locale.languageCode.toLowerCase())) {
+      if (language.languageCode!
+          .toLowerCase()
+          .contains(_locale.languageCode.toLowerCase())) {
         _selectedLanguageIndex = AppConstants.languages.indexOf(language);
       }
     }
   }
-
 }

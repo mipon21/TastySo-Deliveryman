@@ -1,8 +1,8 @@
-import 'package:stackfood_multivendor_driver/common/widgets/custom_image_widget.dart';
-import 'package:stackfood_multivendor_driver/feature/order/domain/models/order_details_model.dart';
-import 'package:stackfood_multivendor_driver/helper/price_converter_helper.dart';
-import 'package:stackfood_multivendor_driver/util/dimensions.dart';
-import 'package:stackfood_multivendor_driver/util/styles.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_image_widget.dart';
+import 'package:tastyso_delivery_driver/feature/order/domain/models/order_details_model.dart';
+import 'package:tastyso_delivery_driver/helper/price_converter_helper.dart';
+import 'package:tastyso_delivery_driver/util/dimensions.dart';
+import 'package:tastyso_delivery_driver/util/styles.dart';
 import 'package:flutter/material.dart';
 
 class ProductWidget extends StatelessWidget {
@@ -14,27 +14,30 @@ class ProductWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
       child: Row(children: [
-
-        ClipRRect(borderRadius: BorderRadius.circular(Dimensions.radiusSmall), child: CustomImageWidget(
-          image: '${orderDetailsModel.foodDetails!.imageFullUrl}',
-          height: 50, width: 50, fit: BoxFit.cover,
-        )),
+        ClipRRect(
+            borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+            child: CustomImageWidget(
+              image: '${orderDetailsModel.foodDetails!.imageFullUrl}',
+              height: 50,
+              width: 50,
+              fit: BoxFit.cover,
+            )),
         const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-
         Text('✕ ${orderDetailsModel.quantity}'),
         const SizedBox(width: Dimensions.paddingSizeSmall),
-
-        Expanded(child: Text(
-          orderDetailsModel.foodDetails!.name!, maxLines: 2, overflow: TextOverflow.ellipsis,
+        Expanded(
+            child: Text(
+          orderDetailsModel.foodDetails!.name!,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
         )),
         const SizedBox(width: Dimensions.paddingSizeSmall),
-
         Text(
-          PriceConverter.convertPrice(orderDetailsModel.price!-orderDetailsModel.discountOnFood!),
+          PriceConverter.convertPrice(
+              orderDetailsModel.price! - orderDetailsModel.discountOnFood!),
           style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
         ),
-
       ]),
     );
   }

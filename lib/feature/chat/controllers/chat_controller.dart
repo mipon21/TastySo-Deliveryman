@@ -1,18 +1,19 @@
+import 'dart:async';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
-import 'package:stackfood_multivendor_driver/common/widgets/custom_snackbar_widget.dart';
-import 'package:stackfood_multivendor_driver/feature/chat/domain/services/chat_service_interface.dart';
-import 'package:stackfood_multivendor_driver/api/api_client.dart';
-import 'package:stackfood_multivendor_driver/feature/notification/domain/models/notification_body_model.dart';
-import 'package:stackfood_multivendor_driver/feature/chat/domain/models/conversation_model.dart';
-import 'package:stackfood_multivendor_driver/feature/chat/domain/models/message_model.dart';
-import 'package:stackfood_multivendor_driver/feature/profile/controllers/profile_controller.dart';
-import 'package:stackfood_multivendor_driver/helper/date_converter_helper.dart';
-import 'package:stackfood_multivendor_driver/helper/image_size_checker.dart';
-import 'package:stackfood_multivendor_driver/helper/user_type_helper.dart';
+import 'package:tastyso_delivery_driver/common/widgets/custom_snackbar_widget.dart';
+import 'package:tastyso_delivery_driver/feature/chat/domain/services/chat_service_interface.dart';
+import 'package:tastyso_delivery_driver/api/api_client.dart';
+import 'package:tastyso_delivery_driver/feature/notification/domain/models/notification_body_model.dart';
+import 'package:tastyso_delivery_driver/feature/chat/domain/models/conversation_model.dart';
+import 'package:tastyso_delivery_driver/feature/chat/domain/models/message_model.dart';
+import 'package:tastyso_delivery_driver/feature/profile/controllers/profile_controller.dart';
+import 'package:tastyso_delivery_driver/helper/date_converter_helper.dart';
+import 'package:tastyso_delivery_driver/helper/image_size_checker.dart';
+import 'package:tastyso_delivery_driver/helper/user_type_helper.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:stackfood_multivendor_driver/util/app_constants.dart';
+import 'package:tastyso_delivery_driver/util/app_constants.dart';
 
 class ChatController extends GetxController implements GetxService {
   final ChatServiceInterface chatServiceInterface;
@@ -33,10 +34,10 @@ class ChatController extends GetxController implements GetxService {
   final bool _isMe = false;
   bool get isMe => _isMe;
 
-  bool _isLoading= false;
+  bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  List <XFile>? _chatImage = [];
+  List<XFile>? _chatImage = [];
   List<XFile>? get chatImage => _chatImage;
 
   int? _pageSize;
@@ -54,7 +55,7 @@ class ChatController extends GetxController implements GetxService {
   MessageModel? _messageModel;
   MessageModel? get messageModel => _messageModel;
 
-  bool _tabLoading= false;
+  bool _tabLoading = false;
   bool get tabLoading => _tabLoading;
 
   String _type = 'customer';
@@ -62,6 +63,103 @@ class ChatController extends GetxController implements GetxService {
 
   bool _clickTab = false;
   bool get clickTab => _clickTab;
+
+  Timer? _messagePollingTimer;
+  NotificationBodyModel? _currentNotificationBody;
+  int? _currentConversationId;
+  bool _isPollingActive = false;
+
+  void startMessagePolling(NotificationBodyModel? notificationBody, User? user,
+      int? conversationId) {
+    // Stop any existing polling first
+    stopMessagePolling();
+
+    _currentNotificationBody = notificationBody;
+    _currentConversationId = conversationId;
+    _isPollingActive = true;
+
+    // Start polling after a short delay to ensure initial load is complete
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (_isPollingActive) {
+        // Poll every 3 seconds for new messages
+        _messagePollingTimer =
+            Timer.periodic(const Duration(seconds: 3), (timer) {
+          if (_messageModel != null &&
+              _currentNotificationBody != null &&
+              _isPollingActive) {
+            _pollForNewMessages();
+          }
+        });
+      }
+    });
+  }
+
+  void stopMessagePolling() {
+    _isPollingActive = false;
+    _messagePollingTimer?.cancel();
+    _messagePollingTimer = null;
+    _currentNotificationBody = null;
+    _currentConversationId = null;
+  }
+
+  Future<void> _pollForNewMessages() async {
+    if (_isLoading || _messageModel == null || _currentNotificationBody == null)
+      return;
+
+    Response? response;
+    if (_currentNotificationBody!.customerId != null ||
+        _currentNotificationBody!.type == UserType.user.name) {
+      response = await chatServiceInterface.getMessages(
+          1,
+          _currentNotificationBody!.customerId,
+          UserType.user,
+          _currentConversationId);
+    } else if (_currentNotificationBody!.vendorId != null ||
+        _currentNotificationBody!.type == UserType.vendor.name) {
+      response = await chatServiceInterface.getMessages(
+          1,
+          _currentNotificationBody!.vendorId,
+          UserType.vendor,
+          _currentConversationId);
+    }
+
+    if (response != null &&
+        response.statusCode == 200 &&
+        response.body['messages'] != null &&
+        response.body['messages'] is List &&
+        (response.body['messages'] as List).isNotEmpty) {
+      MessageModel newMessageModel = MessageModel.fromJson(response.body);
+
+      if (newMessageModel.messages != null &&
+          newMessageModel.messages!.isNotEmpty) {
+        // Get all current message IDs to avoid duplicates
+        Set<int> currentMessageIds = _messageModel!.messages!
+            .where((msg) => msg.id != null)
+            .map((msg) => msg.id!)
+            .toSet();
+
+        // Find new messages that don't exist in current list
+        List<Message> newMessages = newMessageModel.messages!.where((msg) {
+          return msg.id != null && !currentMessageIds.contains(msg.id!);
+        }).toList();
+
+        if (newMessages.isNotEmpty) {
+          // Messages come from API in reverse order (newest first), so add them to the beginning
+          // Sort new messages by ID descending to maintain order
+          newMessages.sort((a, b) => (b.id ?? 0).compareTo(a.id ?? 0));
+          _messageModel!.messages!.insertAll(0, newMessages);
+          _messageModel!.totalSize = newMessageModel.totalSize;
+          update();
+        }
+      }
+    }
+  }
+
+  @override
+  void onClose() {
+    stopMessagePolling();
+    super.onClose();
+  }
 
   int _onMessageTimeShowID = 0;
   int get onMessageTimeShowID => _onMessageTimeShowID;
@@ -75,10 +173,10 @@ class ChatController extends GetxController implements GetxService {
   bool _isClickedOnImageOrFile = false;
   bool get isClickedOnImageOrFile => _isClickedOnImageOrFile;
 
-  bool _takeImageLoading= false;
+  bool _takeImageLoading = false;
   bool get takeImageLoading => _takeImageLoading;
 
-  List <Uint8List>_chatRawImage = [];
+  List<Uint8List> _chatRawImage = [];
   List<Uint8List> get chatRawImage => _chatRawImage;
 
   List<XFile> objFile = [];
@@ -89,22 +187,25 @@ class ChatController extends GetxController implements GetxService {
   XFile? _pickedVideoFile;
   XFile? get pickedVideoFile => _pickedVideoFile;
 
-  Future<void> getConversationList(int offset, {String type = '', bool canUpdate = true, bool fromTab = true}) async{
-    if(fromTab) {
+  Future<void> getConversationList(int offset,
+      {String type = '', bool canUpdate = true, bool fromTab = true}) async {
+    if (fromTab) {
       _tabLoading = true;
     }
-    if(canUpdate) {
+    if (canUpdate) {
       update();
     }
     _searchConversationModel = null;
-    ConversationsModel? conversationModel = await chatServiceInterface.getConversationList(offset, type);
-    if(conversationModel != null) {
-      if(offset == 1) {
+    ConversationsModel? conversationModel =
+        await chatServiceInterface.getConversationList(offset, type);
+    if (conversationModel != null) {
+      if (offset == 1) {
         _conversationModel = conversationModel;
-      }else {
+      } else {
         _conversationModel!.totalSize = conversationModel.totalSize;
         _conversationModel!.offset = conversationModel.offset;
-        _conversationModel!.conversations!.addAll(conversationModel.conversations!);
+        _conversationModel!.conversations!
+            .addAll(conversationModel.conversations!);
       }
     }
     _tabLoading = false;
@@ -114,8 +215,9 @@ class ChatController extends GetxController implements GetxService {
   Future<void> searchConversation(String name) async {
     _searchConversationModel = ConversationsModel();
     update();
-    ConversationsModel? searchConversationModel = await chatServiceInterface.searchConversationList(name);
-    if(searchConversationModel != null) {
+    ConversationsModel? searchConversationModel =
+        await chatServiceInterface.searchConversationList(name);
+    if (searchConversationModel != null) {
       _searchConversationModel = searchConversationModel;
     }
     update();
@@ -126,45 +228,60 @@ class ChatController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> getMessages(int offset, NotificationBodyModel notificationBody, User? user, int? conversationID, {bool firstLoad = false}) async {
+  Future<void> getMessages(int offset, NotificationBodyModel notificationBody,
+      User? user, int? conversationID,
+      {bool firstLoad = false}) async {
     Response? response;
-    if(firstLoad) {
+    if (firstLoad) {
       _messageModel = null;
     }
 
-    if(notificationBody.customerId != null || notificationBody.type == UserType.user.name) {
-      response = await chatServiceInterface.getMessages(offset, notificationBody.customerId, UserType.user, conversationID);
-    }else if(notificationBody.vendorId != null || notificationBody.type == UserType.vendor.name) {
-      response = await chatServiceInterface.getMessages(offset, notificationBody.vendorId, UserType.vendor, conversationID);
+    if (notificationBody.customerId != null ||
+        notificationBody.type == UserType.user.name) {
+      response = await chatServiceInterface.getMessages(
+          offset, notificationBody.customerId, UserType.user, conversationID);
+    } else if (notificationBody.vendorId != null ||
+        notificationBody.type == UserType.vendor.name) {
+      response = await chatServiceInterface.getMessages(
+          offset, notificationBody.vendorId, UserType.vendor, conversationID);
     }
 
-    if (response != null && response.body['messages'] != {} && response.statusCode == 200) {
+    if (response != null &&
+        response.body['messages'] != {} &&
+        response.statusCode == 200) {
       if (offset == 1) {
-
-        if(Get.find<ProfileController>().profileModel == null) {
+        if (Get.find<ProfileController>().profileModel == null) {
           await Get.find<ProfileController>().getProfile();
         }
 
         _messageModel = MessageModel.fromJson(response.body);
-        if(_messageModel!.conversation == null && user != null) {
-          _messageModel!.conversation = Conversation(sender: User(
-            id: Get.find<ProfileController>().profileModel!.id, imageFullUrl: Get.find<ProfileController>().profileModel!.imageFullUrl,
-            fName: Get.find<ProfileController>().profileModel!.fName, lName: Get.find<ProfileController>().profileModel!.lName,
-          ), receiver: user);
-        }else if(_messageModel!.conversation != null && _messageModel!.conversation!.receiverType == 'delivery_man') {
+        if (_messageModel!.conversation == null && user != null) {
+          _messageModel!.conversation = Conversation(
+              sender: User(
+                id: Get.find<ProfileController>().profileModel!.id,
+                imageFullUrl:
+                    Get.find<ProfileController>().profileModel!.imageFullUrl,
+                fName: Get.find<ProfileController>().profileModel!.fName,
+                lName: Get.find<ProfileController>().profileModel!.lName,
+              ),
+              receiver: user);
+        } else if (_messageModel!.conversation != null &&
+            _messageModel!.conversation!.receiverType == 'delivery_man') {
           User? receiver = _messageModel!.conversation!.receiver;
-          _messageModel!.conversation!.receiver = _messageModel!.conversation!.sender;
+          _messageModel!.conversation!.receiver =
+              _messageModel!.conversation!.sender;
           _messageModel!.conversation!.sender = receiver;
         }
-      }else {
-        _messageModel!.totalSize = MessageModel.fromJson(response.body).totalSize;
+      } else {
+        _messageModel!.totalSize =
+            MessageModel.fromJson(response.body).totalSize;
         _messageModel!.offset = MessageModel.fromJson(response.body).offset;
-        _messageModel!.messages!.addAll(MessageModel.fromJson(response.body).messages!);
+        _messageModel!.messages!
+            .addAll(MessageModel.fromJson(response.body).messages!);
       }
     }
     _isLoading = false;
     update();
-
   }
 
 /*  void pickImage(bool isRemove) async {
@@ -186,16 +303,17 @@ class ChatController extends GetxController implements GetxService {
     _takeImageLoading = true;
     update();
 
-    if(isRemove) {
+    if (isRemove) {
       _chatImage = [];
       _chatRawImage = [];
     } else {
-      List<XFile> imageFiles = await ImagePicker().pickMultiImage(imageQuality: 40);
-      for(XFile xFile in imageFiles) {
-        if(_chatImage!.length >= AppConstants.maxImageSend) {
+      List<XFile> imageFiles =
+          await ImagePicker().pickMultiImage(imageQuality: 40);
+      for (XFile xFile in imageFiles) {
+        if (_chatImage!.length >= AppConstants.maxImageSend) {
           showCustomSnackBar('can_not_add_more_than_3_image'.tr);
           break;
-        }else {
+        } else {
           objFile = [];
           _pickedVideoFile = null;
           _chatImage?.add(xFile);
@@ -214,7 +332,7 @@ class ChatController extends GetxController implements GetxService {
 
     _singleFIleCrossMaxLimit = false;
 
-    if(isRemove) {
+    if (isRemove) {
       objFile.removeAt(index!);
     } else {
       List<PlatformFile>? platformFile = (await FilePicker.platform.pickFiles(
@@ -222,23 +340,26 @@ class ChatController extends GetxController implements GetxService {
         withReadStream: true,
         type: FileType.custom,
         allowedExtensions: ['pdf', 'doc'],
-      ))?.files ;
+      ))
+          ?.files;
 
       objFile = [];
       _chatImage = [];
       _pickedVideoFile = null;
 
       platformFile?.forEach((element) async {
-        if(_getFileSizeFromPlatformFileToDouble(element) > AppConstants.maxSizeOfASingleFile) {
+        if (_getFileSizeFromPlatformFileToDouble(element) >
+            AppConstants.maxSizeOfASingleFile) {
           _singleFIleCrossMaxLimit = true;
         } else {
-          if(objFile.length < AppConstants.maxLimitOfTotalFileSent){
-            if((await _getMultipleFileSizeFromPlatformFiles(objFile) + _getFileSizeFromPlatformFileToDouble(element)) < AppConstants.maxLimitOfFileSentINConversation){
+          if (objFile.length < AppConstants.maxLimitOfTotalFileSent) {
+            if ((await _getMultipleFileSizeFromPlatformFiles(objFile) +
+                    _getFileSizeFromPlatformFileToDouble(element)) <
+                AppConstants.maxLimitOfFileSentINConversation) {
               objFile.add(element.xFile);
             }
             // objFile.add(element.xFile);
           }
-
         }
       });
 
@@ -252,21 +373,23 @@ class ChatController extends GetxController implements GetxService {
     _takeImageLoading = true;
     update();
 
-    if(isRemove) {
+    if (isRemove) {
       _pickedVideoFile = null;
     } else {
-      _pickedVideoFile = await ImagePicker().pickVideo(source: ImageSource.gallery);
-      if(_pickedVideoFile != null){
-        double videoSize = await ImageSize.getImageSizeFromXFile(_pickedVideoFile!);
-        if(videoSize > AppConstants.limitOfPickedVideoSizeInMB){
+      _pickedVideoFile =
+          await ImagePicker().pickVideo(source: ImageSource.gallery);
+      if (_pickedVideoFile != null) {
+        double videoSize =
+            await ImageSize.getImageSizeFromXFile(_pickedVideoFile!);
+        if (videoSize > AppConstants.limitOfPickedVideoSizeInMB) {
           _pickedVideoFile = null;
-          showCustomSnackBar('${"video_size_greater_than".tr} ${AppConstants.limitOfPickedVideoSizeInMB}mb');
+          showCustomSnackBar(
+              '${"video_size_greater_than".tr} ${AppConstants.limitOfPickedVideoSizeInMB}mb');
           update();
-        }else{
+        } else {
           _chatImage = [];
           objFile = [];
         }
-
       }
       _isSendButtonActive = true;
     }
@@ -274,10 +397,10 @@ class ChatController extends GetxController implements GetxService {
     update();
   }
 
-  void removeImage(int index,  String messageText){
+  void removeImage(int index, String messageText) {
     _chatImage?.removeAt(index);
     _chatRawImage.removeAt(index);
-    if(_chatImage!.isEmpty && messageText.isEmpty) {
+    if (_chatImage!.isEmpty && messageText.isEmpty) {
       _isSendButtonActive = false;
     }
     update();
@@ -288,17 +411,27 @@ class ChatController extends GetxController implements GetxService {
     update();
   }
 
-  Future<Response?> sendMessage({required String message, required NotificationBodyModel? notificationBody, required int? conversationId}) async {
+  Future<Response?> sendMessage(
+      {required String message,
+      required NotificationBodyModel? notificationBody,
+      required int? conversationId}) async {
     Response? response;
     _isLoading = true;
     update();
 
-    List<MultipartBody> myImages = chatServiceInterface.processImages(_chatImage, objFile, _pickedVideoFile);
+    List<MultipartBody> myImages = chatServiceInterface.processImages(
+        _chatImage, objFile, _pickedVideoFile);
 
-    if(notificationBody != null && (notificationBody.customerId != null || notificationBody.type == UserType.user.name)) {
-      response = await chatServiceInterface.sendMessage(message, myImages, conversationId, notificationBody.customerId, UserType.customer);
-    }else if(notificationBody != null && (notificationBody.vendorId != null || notificationBody.type == UserType.vendor.name)){
-      response = await chatServiceInterface.sendMessage(message, myImages, conversationId, notificationBody.vendorId, UserType.vendor);
+    if (notificationBody != null &&
+        (notificationBody.customerId != null ||
+            notificationBody.type == UserType.user.name)) {
+      response = await chatServiceInterface.sendMessage(message, myImages,
+          conversationId, notificationBody.customerId, UserType.customer);
+    } else if (notificationBody != null &&
+        (notificationBody.vendorId != null ||
+            notificationBody.type == UserType.vendor.name)) {
+      response = await chatServiceInterface.sendMessage(message, myImages,
+          conversationId, notificationBody.vendorId, UserType.vendor);
     }
 
     if (response!.statusCode == 200) {
@@ -309,10 +442,16 @@ class ChatController extends GetxController implements GetxService {
       _isSendButtonActive = false;
       _isLoading = false;
       _messageModel = MessageModel.fromJson(response.body);
-      if(_messageModel!.conversation != null && _messageModel!.conversation!.receiverType == 'delivery_man') {
+      if (_messageModel!.conversation != null &&
+          _messageModel!.conversation!.receiverType == 'delivery_man') {
         User? receiver = _messageModel!.conversation!.receiver;
-        _messageModel!.conversation!.receiver = _messageModel!.conversation!.sender;
+        _messageModel!.conversation!.receiver =
+            _messageModel!.conversation!.sender;
         _messageModel!.conversation!.sender = receiver;
+      }
+      // Ensure polling continues after sending message
+      if (!_isPollingActive) {
+        startMessagePolling(notificationBody, null, conversationId);
       }
     }
     update();
@@ -321,7 +460,7 @@ class ChatController extends GetxController implements GetxService {
 
   void setType(String type, {bool willUpdate = true}) {
     _type = type;
-    if(willUpdate) {
+    if (willUpdate) {
       update();
     }
   }
@@ -332,11 +471,14 @@ class ChatController extends GetxController implements GetxService {
 
   String getChatTime(String todayChatTimeInUtc, String? nextChatTimeInUtc) {
     String chatTime = '';
-    DateTime todayConversationDateTime = DateConverter.isoUtcStringToLocalTimeOnly(todayChatTimeInUtc);
-    try{
-      todayConversationDateTime = DateConverter.isoUtcStringToLocalTimeOnly(todayChatTimeInUtc);
-    }catch(e) {
-      todayConversationDateTime = DateConverter.dateTimeStringToDate(todayChatTimeInUtc);
+    DateTime todayConversationDateTime =
+        DateConverter.isoUtcStringToLocalTimeOnly(todayChatTimeInUtc);
+    try {
+      todayConversationDateTime =
+          DateConverter.isoUtcStringToLocalTimeOnly(todayChatTimeInUtc);
+    } catch (e) {
+      todayConversationDateTime =
+          DateConverter.dateTimeStringToDate(todayChatTimeInUtc);
     }
 
     if (kDebugMode) {
@@ -346,52 +488,67 @@ class ChatController extends GetxController implements GetxService {
     DateTime nextConversationDateTime;
     DateTime currentDate = DateTime.now();
 
-    if(nextChatTimeInUtc == null){
-      return chatTime = DateConverter.isoStringToLocalDateAndTime(todayChatTimeInUtc);
-    }else{
-      nextConversationDateTime = DateConverter.isoUtcStringToLocalTimeOnly(nextChatTimeInUtc);
+    if (nextChatTimeInUtc == null) {
+      return chatTime =
+          DateConverter.isoStringToLocalDateAndTime(todayChatTimeInUtc);
+    } else {
+      nextConversationDateTime =
+          DateConverter.isoUtcStringToLocalTimeOnly(nextChatTimeInUtc);
       if (kDebugMode) {
         print("Next Message DateTime: $nextConversationDateTime");
-        print("The Difference between this two : ${todayConversationDateTime.difference(nextConversationDateTime)}");
-        print("Today message Weekday: ${todayConversationDateTime.weekday}\n Next Message WeekDay: ${nextConversationDateTime.weekday}");
+        print(
+            "The Difference between this two : ${todayConversationDateTime.difference(nextConversationDateTime)}");
+        print(
+            "Today message Weekday: ${todayConversationDateTime.weekday}\n Next Message WeekDay: ${nextConversationDateTime.weekday}");
       }
 
-
-      if(todayConversationDateTime.difference(nextConversationDateTime) < const Duration(minutes: 30) &&
-          todayConversationDateTime.weekday == nextConversationDateTime.weekday){
+      if (todayConversationDateTime.difference(nextConversationDateTime) <
+              const Duration(minutes: 30) &&
+          todayConversationDateTime.weekday ==
+              nextConversationDateTime.weekday) {
         chatTime = '';
-      }else if(currentDate.weekday != todayConversationDateTime.weekday
-          && DateConverter.countDays(todayConversationDateTime) < 6){
-        if( (currentDate.weekday -1 == 0 ? 7 : currentDate.weekday -1) == todayConversationDateTime.weekday){
-          chatTime = DateConverter.convert24HourTimeTo12HourTimeWithDay(todayConversationDateTime, false);
-        }else{
-          chatTime = DateConverter.convertStringTimeToDateTime(todayConversationDateTime);
+      } else if (currentDate.weekday != todayConversationDateTime.weekday &&
+          DateConverter.countDays(todayConversationDateTime) < 6) {
+        if ((currentDate.weekday - 1 == 0 ? 7 : currentDate.weekday - 1) ==
+            todayConversationDateTime.weekday) {
+          chatTime = DateConverter.convert24HourTimeTo12HourTimeWithDay(
+              todayConversationDateTime, false);
+        } else {
+          chatTime = DateConverter.convertStringTimeToDateTime(
+              todayConversationDateTime);
         }
-
-      }else if(currentDate.weekday == todayConversationDateTime.weekday
-          && DateConverter.countDays(todayConversationDateTime) < 6){
-        chatTime = DateConverter.convert24HourTimeTo12HourTimeWithDay(todayConversationDateTime, true);
-      }else{
-        chatTime = DateConverter.isoStringToLocalDateAndTime(todayChatTimeInUtc);
+      } else if (currentDate.weekday == todayConversationDateTime.weekday &&
+          DateConverter.countDays(todayConversationDateTime) < 6) {
+        chatTime = DateConverter.convert24HourTimeTo12HourTimeWithDay(
+            todayConversationDateTime, true);
+      } else {
+        chatTime =
+            DateConverter.isoStringToLocalDateAndTime(todayChatTimeInUtc);
       }
     }
     return chatTime;
   }
 
-  String getChatTimeWithPrevious (Message currentChat, Message? previousChat) {
-    DateTime todayConversationDateTime = DateConverter.isoUtcStringToLocalTimeOnly(currentChat.createdAt ?? "");
+  String getChatTimeWithPrevious(Message currentChat, Message? previousChat) {
+    DateTime todayConversationDateTime =
+        DateConverter.isoUtcStringToLocalTimeOnly(currentChat.createdAt ?? "");
 
     DateTime previousConversationDateTime;
 
-    if(previousChat?.createdAt == null) {
+    if (previousChat?.createdAt == null) {
       return 'Not-Same';
     } else {
-      previousConversationDateTime = DateConverter.isoUtcStringToLocalTimeOnly(previousChat!.createdAt!);
-      if(kDebugMode) {
-        print("The Difference is ${previousConversationDateTime.difference(todayConversationDateTime) < const Duration(minutes: 30)}");
+      previousConversationDateTime =
+          DateConverter.isoUtcStringToLocalTimeOnly(previousChat!.createdAt!);
+      if (kDebugMode) {
+        print(
+            "The Difference is ${previousConversationDateTime.difference(todayConversationDateTime) < const Duration(minutes: 30)}");
       }
-      if(previousConversationDateTime.difference(todayConversationDateTime) < const Duration(minutes: 30) &&
-          todayConversationDateTime.weekday == previousConversationDateTime.weekday && _isSameUserWithPreviousMessage(currentChat, previousChat)) {
+      if (previousConversationDateTime.difference(todayConversationDateTime) <
+              const Duration(minutes: 30) &&
+          todayConversationDateTime.weekday ==
+              previousConversationDateTime.weekday &&
+          _isSameUserWithPreviousMessage(currentChat, previousChat)) {
         return '';
       } else {
         return 'Not-Same';
@@ -399,8 +556,11 @@ class ChatController extends GetxController implements GetxService {
     }
   }
 
-  bool _isSameUserWithPreviousMessage(Message? previousConversation, Message? currentConversation){
-    if(previousConversation?.senderId == currentConversation?.senderId && previousConversation?.message != null && currentConversation?.message !=null){
+  bool _isSameUserWithPreviousMessage(
+      Message? previousConversation, Message? currentConversation) {
+    if (previousConversation?.senderId == currentConversation?.senderId &&
+        previousConversation?.message != null &&
+        currentConversation?.message != null) {
       return true;
     }
     return false;
@@ -409,12 +569,13 @@ class ChatController extends GetxController implements GetxService {
   void toggleOnClickMessage(int onMessageTimeShowID, {bool recall = true}) {
     _onImageOrFileTimeShowID = 0;
     _isClickedOnImageOrFile = false;
-    if(_isClickedOnMessage && _onMessageTimeShowID != onMessageTimeShowID){
+    if (_isClickedOnMessage && _onMessageTimeShowID != onMessageTimeShowID) {
       _onMessageTimeShowID = onMessageTimeShowID;
-    }else if(_isClickedOnMessage && _onMessageTimeShowID == onMessageTimeShowID){
+    } else if (_isClickedOnMessage &&
+        _onMessageTimeShowID == onMessageTimeShowID) {
       _isClickedOnMessage = false;
       _onMessageTimeShowID = 0;
-    }else{
+    } else {
       _isClickedOnMessage = true;
       _onMessageTimeShowID = onMessageTimeShowID;
     }
@@ -422,20 +583,24 @@ class ChatController extends GetxController implements GetxService {
   }
 
   String? getOnPressChatTime(Message currentMessage) {
-
-    if(currentMessage.id == _onMessageTimeShowID || currentMessage.id == _onImageOrFileTimeShowID){
+    if (currentMessage.id == _onMessageTimeShowID ||
+        currentMessage.id == _onImageOrFileTimeShowID) {
       DateTime currentDate = DateTime.now();
-      DateTime todayConversationDateTime = DateConverter.isoUtcStringToLocalTimeOnly(currentMessage.createdAt ?? "");
+      DateTime todayConversationDateTime =
+          DateConverter.isoUtcStringToLocalTimeOnly(
+              currentMessage.createdAt ?? "");
 
-      if(currentDate.weekday != todayConversationDateTime.weekday && DateConverter.countDays(todayConversationDateTime) <= 7){
+      if (currentDate.weekday != todayConversationDateTime.weekday &&
+          DateConverter.countDays(todayConversationDateTime) <= 7) {
         return DateConverter.convertDateTimeToDate(todayConversationDateTime);
-      }else if(currentDate.weekday == todayConversationDateTime.weekday
-          && DateConverter.countDays(todayConversationDateTime) <= 7){
+      } else if (currentDate.weekday == todayConversationDateTime.weekday &&
+          DateConverter.countDays(todayConversationDateTime) <= 7) {
         return DateConverter.convertDateTimeToDate(todayConversationDateTime);
-      }else{
-        return DateConverter.isoStringToLocalDateAndTime(currentMessage.createdAt!);
+      } else {
+        return DateConverter.isoStringToLocalDateAndTime(
+            currentMessage.createdAt!);
       }
-    }else{
+    } else {
       return null;
     }
   }
@@ -443,31 +608,32 @@ class ChatController extends GetxController implements GetxService {
   void toggleOnClickImageAndFile(int onImageOrFileTimeShowID) {
     _onMessageTimeShowID = 0;
     _isClickedOnMessage = false;
-    if(_isClickedOnImageOrFile && _onImageOrFileTimeShowID != onImageOrFileTimeShowID){
+    if (_isClickedOnImageOrFile &&
+        _onImageOrFileTimeShowID != onImageOrFileTimeShowID) {
       _onImageOrFileTimeShowID = onImageOrFileTimeShowID;
-    }else if(_isClickedOnImageOrFile && _onImageOrFileTimeShowID == onImageOrFileTimeShowID){
+    } else if (_isClickedOnImageOrFile &&
+        _onImageOrFileTimeShowID == onImageOrFileTimeShowID) {
       _isClickedOnImageOrFile = false;
       _onImageOrFileTimeShowID = 0;
-    }else{
+    } else {
       _isClickedOnImageOrFile = true;
       _onImageOrFileTimeShowID = onImageOrFileTimeShowID;
     }
     update();
   }
 
-  double _getFileSizeFromPlatformFileToDouble(PlatformFile platformFile)  {
+  double _getFileSizeFromPlatformFileToDouble(PlatformFile platformFile) {
     return (platformFile.size / (1024 * 1024));
   }
 
-  Future<double> _getMultipleFileSizeFromPlatformFiles(List<XFile> platformFiles)  async {
+  Future<double> _getMultipleFileSizeFromPlatformFiles(
+      List<XFile> platformFiles) async {
     double fileSize = 0.0;
     for (var element in platformFiles) {
-      int sizeInKB =  await element.length();
+      int sizeInKB = await element.length();
       double sizeInMB = sizeInKB / (1024 * 1024);
-      fileSize  = sizeInMB + fileSize;
+      fileSize = sizeInMB + fileSize;
     }
     return fileSize;
   }
-
-
 }
