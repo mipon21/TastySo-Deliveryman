@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # tastyso_delivery_driver
+=======
+# tastyso_multivendor_driver
+>>>>>>> 1e38c7d83459e66d2f4ee9607d34b1b4c1cdabbc
 
 A new Flutter application.
 
