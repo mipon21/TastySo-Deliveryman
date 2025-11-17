@@ -2,7 +2,7 @@ import 'package:tastyso_delivery_driver/feature/language/domain/models/language_
 import 'package:tastyso_delivery_driver/util/images.dart';
 
 class AppConstants {
-  static const String appName = 'TastySo Delivery';
+  static const String appName = 'TastySo Rider';
   static const double appVersion = 1.0;
 
   ///Flutter SDK: 3.32.7

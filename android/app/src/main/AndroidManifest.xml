@@ -31,7 +31,7 @@
     <application
         tools:replace="android:label"
         android:name="${applicationName}"
-        android:label="TastySo Delivery"
+        android:label="TastySo Rider"
         android:icon="@mipmap/launcher_icon"
         android:extractNativeLibs="true"
         android:requestLegacyExternalStorage="true"
