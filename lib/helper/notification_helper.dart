@@ -17,52 +17,95 @@ import 'package:tastyso_delivery_driver/util/app_constants.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:vibration/vibration.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/widgets.dart';
+import 'package:tastyso_delivery_driver/main.dart';
+
+const String _foregroundOrderIdKey = 'foreground_order_id';
+
+Future<void> _persistForegroundOrderId(String? orderId) async {
+  final sharedPreferences = await SharedPreferences.getInstance();
+  if (orderId != null && orderId.isNotEmpty) {
+    await sharedPreferences.setString(_foregroundOrderIdKey, orderId);
+  } else {
+    await sharedPreferences.remove(_foregroundOrderIdKey);
+  }
+}
+
+Future<String?> _readForegroundOrderId() async {
+  final sharedPreferences = await SharedPreferences.getInstance();
+  return sharedPreferences.getString(_foregroundOrderIdKey);
+}
+
+Future<void> _stopForegroundIfMatches(String? orderId) async {
+  if (orderId == null || orderId.isEmpty) return;
+  final storedOrderId = await _readForegroundOrderId();
+  if (storedOrderId == orderId) {
+    await stopService();
+  }
+}
 
 class NotificationHelper {
   static Future<void> initialize(
-      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
-    var androidInitialize =
-        const AndroidInitializationSettings('notification_icon');
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
+  ) async {
+    var androidInitialize = const AndroidInitializationSettings(
+      'notification_icon',
+    );
     var iOSInitialize = const DarwinInitializationSettings();
-    var initializationsSettings =
-        InitializationSettings(android: androidInitialize, iOS: iOSInitialize);
+    var initializationsSettings = InitializationSettings(
+      android: androidInitialize,
+      iOS: iOSInitialize,
+    );
     flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()!
         .requestNotificationsPermission();
-    flutterLocalNotificationsPlugin.initialize(initializationsSettings,
-        onDidReceiveNotificationResponse: (load) async {
-      try {
-        if (load.payload!.isNotEmpty) {
-          NotificationBodyModel payload =
-              NotificationBodyModel.fromJson(jsonDecode(load.payload!));
+    flutterLocalNotificationsPlugin.initialize(
+      initializationsSettings,
+      onDidReceiveNotificationResponse: (load) async {
+        try {
+          if (load.payload!.isNotEmpty) {
+            NotificationBodyModel payload = NotificationBodyModel.fromJson(
+              jsonDecode(load.payload!),
+            );
 
-          if (payload.notificationType == NotificationType.order ||
-              payload.notificationType == NotificationType.assign) {
-            Get.toNamed(RouteHelper.getOrderDetailsRoute(payload.orderId,
-                fromNotification: true));
-          } else if (payload.notificationType ==
-              NotificationType.order_request) {
-            customPrint('order requested------------');
-            Get.toNamed(RouteHelper.getMainRoute('order-request'));
-          } else if (payload.notificationType == NotificationType.message) {
-            Get.toNamed(RouteHelper.getChatRoute(
-                notificationBody: payload,
-                conversationId: payload.conversationId,
-                fromNotification: true));
-          } else if (payload.notificationType == NotificationType.block ||
-              payload.notificationType == NotificationType.unblock) {
-            Get.toNamed(RouteHelper.getSignInRoute());
-          } else if (payload.notificationType == NotificationType.unassign) {
-            Get.to(const DashboardScreen(pageIndex: 1));
-          } else {
-            Get.toNamed(
-                RouteHelper.getNotificationRoute(fromNotification: true));
+            if (payload.notificationType == NotificationType.order ||
+                payload.notificationType == NotificationType.assign) {
+              Get.toNamed(
+                RouteHelper.getOrderDetailsRoute(
+                  payload.orderId,
+                  fromNotification: true,
+                ),
+              );
+            } else if (payload.notificationType ==
+                NotificationType.order_request) {
+              customPrint('order requested------------');
+              Get.toNamed(RouteHelper.getMainRoute('order-request'));
+            } else if (payload.notificationType == NotificationType.message) {
+              Get.toNamed(
+                RouteHelper.getChatRoute(
+                  notificationBody: payload,
+                  conversationId: payload.conversationId,
+                  fromNotification: true,
+                ),
+              );
+            } else if (payload.notificationType == NotificationType.block ||
+                payload.notificationType == NotificationType.unblock) {
+              Get.toNamed(RouteHelper.getSignInRoute());
+            } else if (payload.notificationType == NotificationType.unassign) {
+              Get.to(const DashboardScreen(pageIndex: 1));
+            } else {
+              Get.toNamed(
+                RouteHelper.getNotificationRoute(fromNotification: true),
+              );
+            }
           }
-        }
-      } catch (_) {}
-      return;
-    });
+        } catch (_) {}
+        return;
+      },
+    );
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       customPrint("onMessage: ${message.data}");
@@ -75,8 +118,10 @@ class NotificationHelper {
       if (message.data['type'] == 'message' &&
           Get.currentRoute.startsWith(RouteHelper.chatScreen)) {
         if (Get.find<AuthController>().isLoggedIn()) {
-          Get.find<ChatController>()
-              .getConversationList(1, type: Get.find<ChatController>().type);
+          Get.find<ChatController>().getConversationList(
+            1,
+            type: Get.find<ChatController>().type,
+          );
           if (Get.find<ChatController>()
                   .messageModel!
                   .conversation!
@@ -99,17 +144,23 @@ class NotificationHelper {
             );
           } else {
             NotificationHelper.showNotification(
-                message, flutterLocalNotificationsPlugin);
+              message,
+              flutterLocalNotificationsPlugin,
+            );
           }
         }
       } else if (message.data['type'] == 'message' &&
           Get.currentRoute.startsWith(RouteHelper.conversationListScreen)) {
         if (Get.find<AuthController>().isLoggedIn()) {
-          Get.find<ChatController>()
-              .getConversationList(1, type: Get.find<ChatController>().type);
+          Get.find<ChatController>().getConversationList(
+            1,
+            type: Get.find<ChatController>().type,
+          );
         }
         NotificationHelper.showNotification(
-            message, flutterLocalNotificationsPlugin);
+          message,
+          flutterLocalNotificationsPlugin,
+        );
       } else if (message.data['type'] == 'maintenance') {
       } else {
         String? type = message.data['type'];
@@ -118,9 +169,12 @@ class NotificationHelper {
             type != 'new_order' &&
             type != 'order_request') {
           NotificationHelper.showNotification(
-              message, flutterLocalNotificationsPlugin);
+            message,
+            flutterLocalNotificationsPlugin,
+          );
           Get.find<OrderController>().getCurrentOrders(
-              status: Get.find<OrderController>().selectedRunningOrderStatus!);
+            status: Get.find<OrderController>().selectedRunningOrderStatus!,
+          );
           Get.find<OrderController>().getLatestOrders();
         }
       }
@@ -131,29 +185,37 @@ class NotificationHelper {
       customPrint("onOpenApp message type:${message.data['type']}");
       try {
         if (message.data.isNotEmpty) {
-          NotificationBodyModel notificationBody =
-              convertNotification(message.data)!;
+          NotificationBodyModel notificationBody = convertNotification(
+            message.data,
+          )!;
 
           if (notificationBody.notificationType == NotificationType.order ||
               notificationBody.notificationType == NotificationType.assign) {
-            Get.toNamed(RouteHelper.getOrderDetailsRoute(
+            Get.toNamed(
+              RouteHelper.getOrderDetailsRoute(
                 int.parse(message.data['order_id']),
-                fromNotification: true));
+                fromNotification: true,
+              ),
+            );
           } else if (notificationBody.notificationType ==
               NotificationType.order_request) {
             Get.toNamed(RouteHelper.getMainRoute('order-request'));
           } else if (notificationBody.notificationType ==
               NotificationType.message) {
-            Get.toNamed(RouteHelper.getChatRoute(
+            Get.toNamed(
+              RouteHelper.getChatRoute(
                 notificationBody: notificationBody,
                 conversationId: notificationBody.conversationId,
-                fromNotification: true));
+                fromNotification: true,
+              ),
+            );
           } else if (notificationBody.notificationType ==
               NotificationType.unassign) {
             Get.to(const DashboardScreen(pageIndex: 1));
           } else {
             Get.toNamed(
-                RouteHelper.getNotificationRoute(fromNotification: true));
+              RouteHelper.getNotificationRoute(fromNotification: true),
+            );
           }
         }
       } catch (_) {}
@@ -161,7 +223,12 @@ class NotificationHelper {
   }
 
   static Future<void> showNotification(
-      RemoteMessage message, FlutterLocalNotificationsPlugin fln) async {
+    RemoteMessage message,
+    FlutterLocalNotificationsPlugin fln,
+  ) async {
+    // Trigger vibration when notification arrives
+    _triggerVibration();
+
     if (!GetPlatform.isIOS) {
       String? title;
       String? body;
@@ -182,7 +249,12 @@ class NotificationHelper {
       if (image != null && image.isNotEmpty) {
         try {
           await showBigPictureNotificationHiddenLargeIcon(
-              title, body, notificationBody, image, fln);
+            title,
+            body,
+            notificationBody,
+            image,
+            fln,
+          );
         } catch (e) {
           await showBigTextNotification(title, body!, notificationBody, fln);
         }
@@ -192,11 +264,24 @@ class NotificationHelper {
     }
   }
 
+  static Future<void> _triggerVibration() async {
+    try {
+      final bool? hasVibrator = await Vibration.hasVibrator();
+      if (hasVibrator == true) {
+        // Vibrate pattern: wait 0ms, vibrate 500ms, wait 200ms, vibrate 500ms
+        Vibration.vibrate(pattern: [0, 500, 200, 500]);
+      }
+    } catch (e) {
+      customPrint('Vibration error: $e');
+    }
+  }
+
   static Future<void> showTextNotification(
-      String title,
-      String body,
-      NotificationBodyModel? notificationBody,
-      FlutterLocalNotificationsPlugin fln) async {
+    String title,
+    String body,
+    NotificationBodyModel? notificationBody,
+    FlutterLocalNotificationsPlugin fln,
+  ) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'stackfood',
@@ -206,19 +291,26 @@ class NotificationHelper {
       priority: Priority.max,
       sound: RawResourceAndroidNotificationSound('notification'),
     );
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-    await fln.show(0, title, body, platformChannelSpecifics,
-        payload: notificationBody != null
-            ? jsonEncode(notificationBody.toJson())
-            : null);
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+    await fln.show(
+      0,
+      title,
+      body,
+      platformChannelSpecifics,
+      payload: notificationBody != null
+          ? jsonEncode(notificationBody.toJson())
+          : null,
+    );
   }
 
   static Future<void> showBigTextNotification(
-      String? title,
-      String body,
-      NotificationBodyModel? notificationBody,
-      FlutterLocalNotificationsPlugin fln) async {
+    String? title,
+    String body,
+    NotificationBodyModel? notificationBody,
+    FlutterLocalNotificationsPlugin fln,
+  ) async {
     BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
       body,
       htmlFormatBigText: true,
@@ -235,23 +327,32 @@ class NotificationHelper {
       playSound: true,
       sound: const RawResourceAndroidNotificationSound('notification'),
     );
-    NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-    await fln.show(0, title, body, platformChannelSpecifics,
-        payload: notificationBody != null
-            ? jsonEncode(notificationBody.toJson())
-            : null);
+    NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+    await fln.show(
+      0,
+      title,
+      body,
+      platformChannelSpecifics,
+      payload: notificationBody != null
+          ? jsonEncode(notificationBody.toJson())
+          : null,
+    );
   }
 
   static Future<void> showBigPictureNotificationHiddenLargeIcon(
-      String? title,
-      String? body,
-      NotificationBodyModel? notificationBody,
-      String image,
-      FlutterLocalNotificationsPlugin fln) async {
+    String? title,
+    String? body,
+    NotificationBodyModel? notificationBody,
+    String image,
+    FlutterLocalNotificationsPlugin fln,
+  ) async {
     final String largeIconPath = await _downloadAndSaveFile(image, 'largeIcon');
-    final String bigPicturePath =
-        await _downloadAndSaveFile(image, 'bigPicture');
+    final String bigPicturePath = await _downloadAndSaveFile(
+      image,
+      'bigPicture',
+    );
     final BigPictureStyleInformation bigPictureStyleInformation =
         BigPictureStyleInformation(
       FilePathAndroidBitmap(bigPicturePath),
@@ -272,16 +373,24 @@ class NotificationHelper {
       importance: Importance.max,
       sound: const RawResourceAndroidNotificationSound('notification'),
     );
-    final NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-    await fln.show(0, title, body, platformChannelSpecifics,
-        payload: notificationBody != null
-            ? jsonEncode(notificationBody.toJson())
-            : null);
+    final NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+    await fln.show(
+      0,
+      title,
+      body,
+      platformChannelSpecifics,
+      payload: notificationBody != null
+          ? jsonEncode(notificationBody.toJson())
+          : null,
+    );
   }
 
   static Future<String> _downloadAndSaveFile(
-      String url, String fileName) async {
+    String url,
+    String fileName,
+  ) async {
     final Directory directory = await getApplicationDocumentsDirectory();
     final String filePath = '${directory.path}/$fileName';
     final http.Response response = await http.get(Uri.parse(url));
@@ -293,8 +402,9 @@ class NotificationHelper {
   static NotificationBodyModel? convertNotification(Map<String, dynamic> data) {
     if (data['type'] == 'order_status' || data['type'] == 'assign') {
       return NotificationBodyModel(
-          orderId: int.parse(data['order_id']),
-          notificationType: NotificationType.order);
+        orderId: int.parse(data['order_id']),
+        notificationType: NotificationType.order,
+      );
     } else if (data['type'] == 'message') {
       return NotificationBodyModel(
         conversationId: (data['conversation_id'] != null &&
@@ -308,7 +418,8 @@ class NotificationHelper {
       );
     } else if (data['type'] == 'order_request') {
       return NotificationBodyModel(
-          notificationType: NotificationType.order_request);
+        notificationType: NotificationType.order_request,
+      );
     } else if (data['type'] == 'block') {
       return NotificationBodyModel(notificationType: NotificationType.block);
     } else if (data['type'] == 'unblock') {
@@ -321,10 +432,27 @@ class NotificationHelper {
       return NotificationBodyModel(notificationType: NotificationType.general);
     }
   }
+
+  static Future<void> dismissForegroundNotificationForOrder(
+      int? orderId) async {
+    if (orderId == null) return;
+
+    // Stop foreground service if it matches this order
+    await _stopForegroundIfMatches(orderId.toString());
+
+    // Also cancel any lingering notifications
+    try {
+      await flutterLocalNotificationsPlugin.cancel(0);
+      await flutterLocalNotificationsPlugin.cancelAll();
+    } catch (e) {
+      customPrint('Error canceling notifications: $e');
+    }
+  }
 }
 
 @pragma('vm:entry-point')
 Future<dynamic> myBackgroundMessageHandler(RemoteMessage message) async {
+  WidgetsFlutterBinding.ensureInitialized();
   customPrint("onBackground: ${message.data}");
   NotificationBodyModel? notificationBody =
       NotificationHelper.convertNotification(message.data);
@@ -337,18 +465,23 @@ Future<dynamic> myBackgroundMessageHandler(RemoteMessage message) async {
 
     _initService();
 
-    await _startService(notificationBody.orderId.toString(),
-        notificationBody.notificationType!);
+    await _startService(
+      notificationBody.orderId.toString(),
+      notificationBody.notificationType!,
+    );
   }
 }
 
 @pragma('vm:entry-point')
 Future<ServiceRequestResult> _startService(
-    String? orderId, NotificationType notificationType) async {
+  String? orderId,
+  NotificationType notificationType,
+) async {
+  ServiceRequestResult result;
   if (await FlutterForegroundTask.isRunningService) {
-    return FlutterForegroundTask.restartService();
+    result = await FlutterForegroundTask.restartService();
   } else {
-    return FlutterForegroundTask.startService(
+    result = await FlutterForegroundTask.startService(
       serviceId: 256,
       notificationTitle: notificationType == NotificationType.order_request
           ? 'Order Notification'
@@ -363,6 +496,8 @@ Future<ServiceRequestResult> _startService(
       // notificationInitialRoute: RouteHelper.getOrderDetailsRoute(int.parse(orderId!), fromNotification: true),
     );
   }
+  await _persistForegroundOrderId(orderId);
+  return result;
 }
 
 @pragma('vm:entry-point')
@@ -396,6 +531,7 @@ Future<ServiceRequestResult> stopService() async {
   } catch (e) {
     customPrint('error-----$e');
   }
+  await _persistForegroundOrderId(null);
   return FlutterForegroundTask.stopService();
 }
 

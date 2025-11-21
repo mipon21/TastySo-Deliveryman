@@ -70,14 +70,14 @@ class SplashScreenState extends State<SplashScreen> {
         child: Padding(
           padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Image.asset(Images.logo, width: 300),
+            Image.asset(Images.logoSplash, width: 300),
             const SizedBox(height: Dimensions.paddingSizeLarge),
 
             // Image.asset(Images.logoName, width: 150),
             // const SizedBox(height: Dimensions.paddingSizeSmall),
 
-            Text('suffix_name'.tr,
-                style: robotoMedium, textAlign: TextAlign.center),
+            // Text('suffix_name'.tr,
+            //     style: robotoMedium, textAlign: TextAlign.center),
           ]),
         ),
       ),

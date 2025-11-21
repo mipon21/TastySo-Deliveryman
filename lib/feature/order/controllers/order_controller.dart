@@ -8,6 +8,7 @@ import 'package:tastyso_delivery_driver/feature/order/domain/models/order_cancel
 import 'package:tastyso_delivery_driver/feature/order/domain/models/order_details_model.dart';
 import 'package:tastyso_delivery_driver/feature/order/domain/models/order_model.dart';
 import 'package:tastyso_delivery_driver/common/widgets/custom_snackbar_widget.dart';
+import 'package:tastyso_delivery_driver/helper/notification_helper.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -318,6 +319,8 @@ class OrderController extends GetxController implements GetxService {
         await orderServiceInterface.acceptOrder(orderID);
     Get.back();
     if (responseModel.isSuccess) {
+      // Dismiss notification for this order
+      await NotificationHelper.dismissForegroundNotificationForOrder(orderID);
       _latestOrderList!.removeAt(index);
       _currentOrderList!.add(orderModel);
     } else {
@@ -333,11 +336,13 @@ class OrderController extends GetxController implements GetxService {
     _ignoredRequests.addAll(orderServiceInterface.getIgnoreList());
   }
 
-  void ignoreOrder(int index) {
-    _ignoredRequests.add(
-        IgnoreModel(id: _latestOrderList![index].id, time: DateTime.now()));
+  void ignoreOrder(int index) async {
+    final orderId = _latestOrderList![index].id;
+    _ignoredRequests.add(IgnoreModel(id: orderId, time: DateTime.now()));
     _latestOrderList!.removeAt(index);
     orderServiceInterface.setIgnoreList(_ignoredRequests);
+    // Dismiss notification for this order
+    await NotificationHelper.dismissForegroundNotificationForOrder(orderId);
     update();
   }
 
