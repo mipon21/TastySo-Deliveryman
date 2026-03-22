@@ -33,18 +33,6 @@ Future<void> _persistForegroundOrderId(String? orderId) async {
   }
 }
 
-Future<String?> _readForegroundOrderId() async {
-  final sharedPreferences = await SharedPreferences.getInstance();
-  return sharedPreferences.getString(_foregroundOrderIdKey);
-}
-
-Future<void> _stopForegroundIfMatches(String? orderId) async {
-  if (orderId == null || orderId.isEmpty) return;
-  final storedOrderId = await _readForegroundOrderId();
-  if (storedOrderId == orderId) {
-    await stopService();
-  }
-}
 
 class NotificationHelper {
   static Future<void> initialize(
@@ -286,6 +274,7 @@ class NotificationHelper {
         AndroidNotificationDetails(
       'stackfood',
       'stackfood_delivery name',
+      icon: 'notification_icon',
       playSound: true,
       importance: Importance.max,
       priority: Priority.max,
@@ -321,6 +310,7 @@ class NotificationHelper {
         AndroidNotificationDetails(
       'stackfood',
       'stackfood_delivery name',
+      icon: 'notification_icon',
       importance: Importance.max,
       styleInformation: bigTextStyleInformation,
       priority: Priority.max,
@@ -366,6 +356,7 @@ class NotificationHelper {
         AndroidNotificationDetails(
       'stackfood',
       'stackfood_delivery name',
+      icon: 'notification_icon',
       largeIcon: FilePathAndroidBitmap(largeIconPath),
       priority: Priority.max,
       playSound: true,
@@ -437,10 +428,24 @@ class NotificationHelper {
       int? orderId) async {
     if (orderId == null) return;
 
-    // Stop foreground service if it matches this order
-    await _stopForegroundIfMatches(orderId.toString());
+    // Always stop the foreground service — only one service runs at a time
+    // and any order acceptance/ignore action should clear the alarm.
+    // The previous ID-match approach failed for order_request notifications
+    // because those are stored with a null order ID.
+    try {
+      if (await FlutterForegroundTask.isRunningService) {
+        await stopService();
+      }
+    } catch (e) {
+      customPrint('Error stopping foreground service: $e');
+    }
 
-    // Also cancel any lingering notifications
+    // Stop any active vibration
+    try {
+      Vibration.cancel();
+    } catch (_) {}
+
+    // Cancel any lingering local notifications
     try {
       await flutterLocalNotificationsPlugin.cancel(0);
       await flutterLocalNotificationsPlugin.cancelAll();

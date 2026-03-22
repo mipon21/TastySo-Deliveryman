@@ -13,6 +13,7 @@ abstract class ProfileServiceInterface {
   void setNotificationActive(bool isActive);
   Future<dynamic> deleteDriver();
   Future<dynamic> getShiftList();
+  Future<dynamic> getEarningHistory({int? offset, int? limit});
   void checkPermission(Function callback);
   Future<String> addressPlaceMark(Position locationResult);
 }

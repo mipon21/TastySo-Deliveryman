@@ -1,7 +1,7 @@
 name: tastyso_delivery_driver
 description: A new Flutter application.
 publish_to: 'none' #
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: ^3.5.0
@@ -55,6 +55,9 @@ dependencies:
   flutter_launcher_icons: ^0.14.4
   android_notification_icons: ^0.0.1
 
+android_notification_icons:
+  image_path: 'assets/image/logo/logo_noti.png'
+  icon_name: 'notification_icon'
 
 dependency_overrides:
   collection: ^1.19.1

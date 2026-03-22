@@ -44,7 +44,10 @@ class SignInViewScreen extends StatelessWidget {
               width: 1170,
               child: GetBuilder<AuthController>(builder: (authController) {
                 return Column(children: [
-                  Image.asset(Images.logo, width: 250),
+                  ClipRRect(
+                      borderRadius:
+                          BorderRadius.circular(Dimensions.radiusSmall),
+                      child: Image.asset(Images.logo, width: 150)),
                   // const SizedBox(height: Dimensions.paddingSizeSmall),
                   // Image.asset(Images.logoName, width: 100),
                   // const SizedBox(height: Dimensions.paddingSizeExtraSmall),

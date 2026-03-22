@@ -13,4 +13,5 @@ abstract class ProfileRepositoryInterface implements RepositoryInterface {
   void setNotificationActive(bool isActive);
   Future<dynamic> deleteDriver();
   Future<dynamic> getShiftList();
+  Future<Map<String, dynamic>?> getEarningHistory({int? offset, int? limit});
 }

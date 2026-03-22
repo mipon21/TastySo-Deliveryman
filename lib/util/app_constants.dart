@@ -53,6 +53,10 @@ class AppConstants {
       '/api/v1/delivery-man/make-wallet-adjustment';
   static const String walletPaymentListUri =
       '/api/v1/delivery-man/wallet-payment-list';
+  static const String walletProvidedEarningListUri =
+      '/api/v1/delivery-man/wallet-provided-earning-list';
+  static const String deliveryManEarningHistoryUri =
+      '/api/v1/delivery-man/delivery-man-earning-history';
   static const String addWithdrawMethodUri =
       '/api/v1/delivery-man/withdraw-method/store';
   static const String disbursementMethodListUri =

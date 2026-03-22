@@ -12,6 +12,7 @@ class BottomNavItemWidget extends StatelessWidget {
   final int? width;
   final int? height;
   final int? pageIndex;
+  final String? label;
   const BottomNavItemWidget(
       {super.key,
       required this.icon,
@@ -19,47 +20,69 @@ class BottomNavItemWidget extends StatelessWidget {
       this.isSelected = false,
       this.pageIndex,
       this.width,
-      this.height});
+      this.height,
+      this.label});
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: IconButton(
-        icon: Stack(
-          clipBehavior: Clip.none,
+      child: InkWell(
+        onTap: onTap as void Function()?,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CustomAssetImageWidget(
-                image: icon,
-                color:
-                    isSelected ? Theme.of(context).primaryColor : Colors.grey,
-                height: height == null ? 25 : height!.toDouble(),
-                width: width == null ? 25 : width!.toDouble()),
-            pageIndex == 1
-                ? Positioned(
-                    top: -8,
-                    right: 0,
-                    child: Container(
-                      padding: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                      child: GetBuilder<OrderController>(
-                          builder: (orderController) {
-                        return Text(
-                          orderController.latestOrderList?.length.toString() ??
-                              '0',
-                          style: robotoRegular.copyWith(
-                              fontSize: Dimensions.fontSizeExtraSmall,
-                              color: Colors.white),
-                        );
-                      }),
-                    ),
-                  )
-                : SizedBox(),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                CustomAssetImageWidget(
+                    image: icon,
+                    color: isSelected
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey,
+                    height: height == null ? 25 : height!.toDouble(),
+                    width: width == null ? 25 : width!.toDouble()),
+                pageIndex == 1
+                    ? Positioned(
+                        top: -8,
+                        right: 0,
+                        child: Container(
+                          padding: EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          child: GetBuilder<OrderController>(
+                              builder: (orderController) {
+                            return Text(
+                              orderController.latestOrderList?.length
+                                      .toString() ??
+                                  '0',
+                              style: robotoRegular.copyWith(
+                                  fontSize: Dimensions.fontSizeExtraSmall,
+                                  color: Colors.white),
+                            );
+                          }),
+                        ),
+                      )
+                    : SizedBox(),
+              ],
+            ),
+            if (label != null && label!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  label!,
+                  style: robotoRegular.copyWith(
+                    fontSize: Dimensions.fontSizeExtraSmall,
+                    color: isSelected
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey,
+                  ),
+                ),
+              ),
           ],
         ),
-        onPressed: onTap as void Function()?,
       ),
     );
   }

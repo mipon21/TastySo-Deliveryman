@@ -9,6 +9,7 @@ import 'package:tastyso_delivery_driver/feature/order/controllers/order_controll
 import 'package:tastyso_delivery_driver/feature/home/widgets/count_card_widget.dart';
 import 'package:tastyso_delivery_driver/feature/home/widgets/earning_widget.dart';
 import 'package:tastyso_delivery_driver/feature/home/widgets/shift_dialogue_widget.dart';
+import 'package:tastyso_delivery_driver/feature/home/widgets/earning_history_section_widget.dart';
 import 'package:tastyso_delivery_driver/feature/order/screens/running_order_screen.dart';
 import 'package:tastyso_delivery_driver/feature/profile/controllers/profile_controller.dart';
 import 'package:tastyso_delivery_driver/helper/price_converter_helper.dart';
@@ -77,6 +78,14 @@ class _HomeScreenState extends State<HomeScreen> {
     Get.find<OrderController>().removeFromIgnoreList();
     Get.find<ProfileController>().getShiftList();
     await Get.find<ProfileController>().getProfile();
+
+    // Load earning history if earnings are enabled
+    final profileController = Get.find<ProfileController>();
+    if (profileController.profileModel != null &&
+        profileController.profileModel!.earnings == 1) {
+      await profileController.getEarningHistory();
+    }
+
     await Get.find<OrderController>().getCurrentOrders(
         status: Get.find<OrderController>().selectedRunningOrderStatus!,
         isDataClear: false);
@@ -148,19 +157,21 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        toolbarHeight: 70,
         backgroundColor: Theme.of(context).cardColor,
         surfaceTintColor: Theme.of(context).cardColor,
         shadowColor: Theme.of(context).disabledColor.withValues(alpha: 0.5),
         elevation: 2,
-        // leading: Padding(
-        //   padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-        //   child: Image.asset(Images.logo, height: 30, width: 30),
-        // ),
         titleSpacing: 0,
         title: Padding(
           padding:
               const EdgeInsets.only(left: Dimensions.paddingSizeSmall * 1.5),
-          child: Image.asset(Images.logoName, width: 200),
+          child: Image.asset(
+            Get.isDarkMode ? Images.logoNameWhite : Images.logoName,
+            width: 250,
+            height: 60,
+          ),
         ),
         actions: [
           IconButton(
@@ -305,8 +316,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ? () {
                                         Get.toNamed(
                                             RouteHelper.getRunningOrderRoute(),
-                                            arguments:
-                                                const RunningOrderScreen());
+                                            arguments: RunningOrderScreen());
                                       }
                                     : null,
                               )
@@ -339,89 +349,98 @@ class _HomeScreenState extends State<HomeScreen> {
                         ? Column(children: [
                             TitleWidget(title: 'earnings'.tr),
                             const SizedBox(height: Dimensions.paddingSizeSmall),
-                            Container(
-                              padding: const EdgeInsets.all(
-                                  Dimensions.paddingSizeLarge),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                    Dimensions.radiusDefault),
-                                color: Get.isDarkMode
-                                    ? Colors.white.withValues(alpha: 0.3)
-                                    : Color(0xff334257),
-                              ),
-                              child: Column(children: [
-                                Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(
-                                          width: Dimensions.paddingSizeSmall),
-                                      Image.asset(Images.wallet,
-                                          width: 60, height: 60),
-                                      const SizedBox(
-                                          width: Dimensions.paddingSizeLarge),
-                                      Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'balance'.tr,
-                                              style: robotoMedium.copyWith(
-                                                  fontSize:
-                                                      Dimensions.fontSizeSmall,
-                                                  color: ColorResources.white),
-                                            ),
-                                            const SizedBox(
-                                                height: Dimensions
-                                                    .paddingSizeSmall),
-                                            profileController.profileModel !=
-                                                    null
-                                                ? Text(
-                                                    PriceConverter.convertPrice(
-                                                        profileController
-                                                            .profileModel!
-                                                            .balance),
-                                                    style: robotoBold.copyWith(
-                                                        fontSize: 24,
-                                                        color: ColorResources
-                                                            .white),
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  )
-                                                : Container(
-                                                    height: 30,
-                                                    width: 60,
+                            InkWell(
+                              onTap: () =>
+                                  Get.toNamed(RouteHelper.getCashInHandRoute()),
+                              child: Container(
+                                padding: const EdgeInsets.all(
+                                    Dimensions.paddingSizeLarge),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(
+                                      Dimensions.radiusDefault),
+                                  color: Get.isDarkMode
+                                      ? Colors.white.withValues(alpha: 0.3)
+                                      : Color(0xff334257),
+                                ),
+                                child: Column(children: [
+                                  Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(
+                                            width: Dimensions.paddingSizeSmall),
+                                        Image.asset(Images.wallet,
+                                            width: 60, height: 60),
+                                        const SizedBox(
+                                            width: Dimensions.paddingSizeLarge),
+                                        Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'balance'.tr,
+                                                style: robotoMedium.copyWith(
+                                                    fontSize: Dimensions
+                                                        .fontSizeSmall,
                                                     color:
                                                         ColorResources.white),
-                                          ]),
-                                    ]),
-                                const SizedBox(height: 30),
-                                Row(children: [
-                                  EarningWidget(
-                                    title: 'today'.tr,
-                                    amount: profileController
-                                        .profileModel?.todaysEarning,
-                                  ),
-                                  Container(
-                                      height: 30,
-                                      width: 1,
-                                      color: Theme.of(context).cardColor),
-                                  EarningWidget(
-                                    title: 'this_week'.tr,
-                                    amount: profileController
-                                        .profileModel?.thisWeekEarning,
-                                  ),
-                                  Container(
-                                      height: 30,
-                                      width: 1,
-                                      color: Theme.of(context).cardColor),
-                                  EarningWidget(
-                                    title: 'this_month'.tr,
-                                    amount: profileController
-                                        .profileModel?.thisMonthEarning,
-                                  ),
+                                              ),
+                                              const SizedBox(
+                                                  height: Dimensions
+                                                      .paddingSizeSmall),
+                                              profileController.profileModel !=
+                                                      null
+                                                  ? Text(
+                                                      PriceConverter
+                                                          .convertPrice(
+                                                              profileController
+                                                                  .profileModel!
+                                                                  .balance),
+                                                      style:
+                                                          robotoBold.copyWith(
+                                                              fontSize: 24,
+                                                              color:
+                                                                  ColorResources
+                                                                      .white),
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    )
+                                                  : Container(
+                                                      height: 30,
+                                                      width: 60,
+                                                      color:
+                                                          ColorResources.white),
+                                            ]),
+                                      ]),
+                                  const SizedBox(height: 30),
+                                  Row(children: [
+                                    EarningWidget(
+                                      title: 'today'.tr,
+                                      amount: profileController
+                                          .profileModel?.todaysEarning,
+                                    ),
+                                    Container(
+                                        height: 30,
+                                        width: 1,
+                                        color: Theme.of(context).cardColor),
+                                    EarningWidget(
+                                      title: 'this_week'.tr,
+                                      amount: profileController
+                                          .profileModel?.thisWeekEarning,
+                                    ),
+                                    Container(
+                                        height: 30,
+                                        width: 1,
+                                        color: Theme.of(context).cardColor),
+                                    EarningWidget(
+                                      title: 'this_month'.tr,
+                                      amount: profileController
+                                          .profileModel?.thisMonthEarning,
+                                    ),
+                                  ]),
                                 ]),
-                              ]),
+                              ),
                             ),
                             const SizedBox(
                                 height: Dimensions.paddingSizeDefault),
@@ -431,29 +450,37 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: Dimensions.paddingSizeSmall),
                     (profileController.profileModel != null &&
                             profileController.profileModel!.earnings == 1)
-                        ? Row(children: [
-                            OrderCountCardWidget(
-                              title: 'todays_orders'.tr,
-                              value: profileController
-                                  .profileModel?.todaysOrderCount
-                                  .toString(),
-                            ),
-                            const SizedBox(
-                                width: Dimensions.paddingSizeDefault),
-                            OrderCountCardWidget(
-                              title: 'this_week_orders'.tr,
-                              value: profileController
-                                  .profileModel?.thisWeekOrderCount
-                                  .toString(),
-                            ),
-                            const SizedBox(
-                                width: Dimensions.paddingSizeDefault),
-                            OrderCountCardWidget(
-                              title: 'total_orders'.tr,
-                              value: profileController.profileModel?.orderCount
-                                  .toString(),
-                            ),
-                          ])
+                        ? GestureDetector(
+                            onTap: () =>
+                                Get.toNamed(RouteHelper.getRunningOrderRoute(),
+                                    arguments: RunningOrderScreen(
+                                      isBackButtonExist: true,
+                                    )),
+                            child: Row(children: [
+                              OrderCountCardWidget(
+                                title: 'todays_orders'.tr,
+                                value: profileController
+                                    .profileModel?.todaysOrderCount
+                                    .toString(),
+                              ),
+                              const SizedBox(
+                                  width: Dimensions.paddingSizeDefault),
+                              OrderCountCardWidget(
+                                title: 'this_week_orders'.tr,
+                                value: profileController
+                                    .profileModel?.thisWeekOrderCount
+                                    .toString(),
+                              ),
+                              const SizedBox(
+                                  width: Dimensions.paddingSizeDefault),
+                              OrderCountCardWidget(
+                                title: 'total_orders'.tr,
+                                value: profileController
+                                    .profileModel?.orderCount
+                                    .toString(),
+                              ),
+                            ]),
+                          )
                         : Column(children: [
                             CountCardWidget(
                               title: 'todays_orders'.tr,
@@ -565,6 +592,24 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           ),
+                    // Show earning history section
+                    if (profileController.profileModel != null &&
+                        profileController.profileModel!.earnings == 1)
+                      Column(
+                        children: [
+                          const SizedBox(height: Dimensions.paddingSizeLarge),
+                          const EarningHistorySectionWidget(),
+                        ],
+                      )
+                    else if (profileController.profileModel != null)
+                      // Debug: Check why earning history is not showing
+                      Builder(
+                        builder: (context) {
+                          debugPrint(
+                              '----Earning History NOT showing - earnings: ${profileController.profileModel!.earnings}, type: ${profileController.profileModel!.type}');
+                          return const SizedBox.shrink();
+                        },
+                      ),
                   ]);
                 }),
               ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:tastyso_delivery_driver/feature/order/controllers/order_controller.dart';
+import 'package:tastyso_delivery_driver/helper/notification_helper.dart';
 import 'package:tastyso_delivery_driver/util/dimensions.dart';
 import 'package:tastyso_delivery_driver/util/images.dart';
 import 'package:tastyso_delivery_driver/util/styles.dart';
@@ -26,6 +27,7 @@ class NewRequestDialogWidget extends StatefulWidget {
 
 class _NewRequestDialogWidgetState extends State<NewRequestDialogWidget> {
   Timer? _timer;
+  AudioPlayer? _audioPlayer;
 
   @override
   void initState() {
@@ -37,22 +39,18 @@ class _NewRequestDialogWidgetState extends State<NewRequestDialogWidget> {
 
   @override
   void dispose() {
-    super.dispose();
-
     _timer?.cancel();
+    _audioPlayer?.stop();
+    _audioPlayer?.dispose();
+    super.dispose();
   }
 
   void _startAlarm() {
-    // Trigger vibration when new order arrives
     _triggerVibration();
-
-    AudioPlayer audio = AudioPlayer();
-    //audio.play('notification.mp3');
-    audio.play(AssetSource('notification.mp3'));
+    _audioPlayer = AudioPlayer();
+    _audioPlayer!.play(AssetSource('notification.mp3'));
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      //audio.play('notification.mp3');
-      audio.play(AssetSource('notification.mp3'));
-      // Vibrate again with each audio play
+      _audioPlayer!.play(AssetSource('notification.mp3'));
       _triggerVibration();
     });
   }
@@ -177,9 +175,10 @@ class _NewRequestDialogWidgetState extends State<NewRequestDialogWidget> {
                             : 'go'.tr
                       : 'ok'.tr,
                   onPressed: () {
-                    if (!widget.isRequest) {
-                      _timer?.cancel();
-                    }
+                    _timer?.cancel();
+                    _audioPlayer?.stop();
+                    NotificationHelper.dismissForegroundNotificationForOrder(
+                        widget.orderId);
                     Get.back();
                     widget.onTap();
                   },

@@ -58,6 +58,13 @@ class ProfileService implements ProfileServiceInterface {
   }
 
   @override
+  Future<Map<String, dynamic>?> getEarningHistory(
+      {int? offset, int? limit}) async {
+    return await profileRepositoryInterface.getEarningHistory(
+        offset: offset, limit: limit);
+  }
+
+  @override
   Future<String> addressPlaceMark(Position locationResult) async {
     String address;
     try {

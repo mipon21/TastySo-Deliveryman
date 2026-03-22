@@ -5,6 +5,7 @@ import 'package:tastyso_delivery_driver/common/widgets/custom_snackbar_widget.da
 import 'package:tastyso_delivery_driver/feature/auth/controllers/auth_controller.dart';
 import 'package:tastyso_delivery_driver/feature/profile/domain/models/profile_model.dart';
 import 'package:tastyso_delivery_driver/feature/profile/domain/models/shift_model.dart';
+import 'package:tastyso_delivery_driver/feature/profile/domain/models/earning_history_model.dart';
 import 'package:tastyso_delivery_driver/feature/profile/domain/services/profile_service_interface.dart';
 import 'package:tastyso_delivery_driver/helper/route_helper.dart';
 import 'package:geolocator/geolocator.dart';
@@ -46,6 +47,18 @@ class ProfileController extends GetxController implements GetxService {
 
   int? _shiftId;
   int? get shiftId => _shiftId;
+
+  List<EarningHistoryModel>? _earningHistoryList;
+  List<EarningHistoryModel>? get earningHistoryList => _earningHistoryList;
+
+  bool _isEarningHistoryLoading = false;
+  bool get isEarningHistoryLoading => _isEarningHistoryLoading;
+
+  int _earningHistoryTotalSize = 0;
+  int get earningHistoryTotalSize => _earningHistoryTotalSize;
+
+  int _earningHistoryOffset = 1;
+  int get earningHistoryOffset => _earningHistoryOffset;
 
   Future<void> getProfile() async {
     ProfileModel? profileModel = await profileServiceInterface.getProfileInfo();
@@ -195,5 +208,79 @@ class ProfileController extends GetxController implements GetxService {
     } else {
       debugPrint('----Failed record');
     }
+  }
+
+  Future<void> getEarningHistory({bool isUpdate = false, int? offset}) async {
+    if (!isUpdate) {
+      _earningHistoryList = null;
+      _earningHistoryOffset = 1;
+    }
+    _isEarningHistoryLoading = true;
+    update();
+
+    Map<String, dynamic>? result =
+        await profileServiceInterface.getEarningHistory(
+      offset: offset ?? _earningHistoryOffset,
+      limit: 25,
+    );
+
+    if (result != null) {
+      // Convert the transactions list properly
+      List<EarningHistoryModel> transactions = [];
+      if (result['transactions'] != null && result['transactions'] is List) {
+        List<dynamic> transactionsList = result['transactions'] as List;
+        transactions = transactionsList
+            .map((item) {
+              if (item is Map<String, dynamic>) {
+                return EarningHistoryModel.fromJson(item);
+              } else if (item is Map) {
+                return EarningHistoryModel.fromJson(Map<String, dynamic>.from(item));
+              } else {
+                return null;
+              }
+            })
+            .whereType<EarningHistoryModel>()
+            .toList();
+        
+        // Debug: Log to see what data we're getting
+        if (transactions.isNotEmpty) {
+          debugPrint('----Earning History First Item - ID: ${transactions.first.id}, OrderID: ${transactions.first.orderId}, Amount: ${transactions.first.amount}');
+        }
+      }
+      
+      // Handle both int and String types for total_size and offset safely
+      dynamic totalSize = result['total_size'];
+      _earningHistoryTotalSize = totalSize is int 
+          ? totalSize
+          : (totalSize is String 
+              ? int.tryParse(totalSize) ?? 0 
+              : (totalSize != null ? int.tryParse(totalSize.toString()) ?? 0 : 0));
+      
+      dynamic offsetValue = result['offset'];
+      _earningHistoryOffset = offsetValue is int
+          ? offsetValue
+          : (offsetValue is String
+              ? int.tryParse(offsetValue) ?? 1
+              : (offsetValue != null ? int.tryParse(offsetValue.toString()) ?? 1 : 1));
+
+      if (_earningHistoryList == null) {
+        _earningHistoryList = [];
+      }
+      if (isUpdate && offset != null && offset > 1) {
+        _earningHistoryList!.addAll(transactions);
+      } else {
+        _earningHistoryList = transactions;
+      }
+      debugPrint(
+          '----Earning History Loaded: ${transactions.length} items, Total: $_earningHistoryTotalSize');
+    } else {
+      // If result is null, set empty list to show empty state
+      _earningHistoryList = [];
+      _earningHistoryTotalSize = 0;
+      debugPrint('----Earning History: No data returned from API');
+    }
+
+    _isEarningHistoryLoading = false;
+    update();
   }
 }

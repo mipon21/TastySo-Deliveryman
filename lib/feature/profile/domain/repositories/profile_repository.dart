@@ -120,6 +120,39 @@ class ProfileRepository implements ProfileRepositoryInterface {
     return shifts;
   }
 
+  @override
+  Future<Map<String, dynamic>?> getEarningHistory(
+      {int? offset, int? limit}) async {
+    Map<String, dynamic>? result;
+    Map<String, dynamic> queryParams = {
+      'token': _getUserToken(),
+    };
+    if (offset != null) {
+      queryParams['offset'] = offset.toString();
+    }
+    if (limit != null) {
+      queryParams['limit'] = limit.toString();
+    }
+
+    String queryString =
+        queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
+
+    // Get delivery man earning history from orders
+    const String earningHistoryUri = AppConstants.deliveryManEarningHistoryUri;
+    Response response =
+        await apiClient.getData('$earningHistoryUri?$queryString');
+    if (response.statusCode == 200) {
+      // Keep transactions as raw List for proper conversion in controller
+      result = {
+        'total_size': response.body['total_size'],
+        'limit': response.body['limit'],
+        'offset': response.body['offset'],
+        'transactions': response.body['transactions'],
+      };
+    }
+    return result;
+  }
+
   Future<Response> _updateToken({String notificationDeviceToken = ''}) async {
     String? deviceToken;
     if (notificationDeviceToken.isEmpty) {

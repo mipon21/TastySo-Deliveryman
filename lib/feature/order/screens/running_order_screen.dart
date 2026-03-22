@@ -11,13 +11,16 @@ import 'package:get/get.dart';
 import 'package:tastyso_delivery_driver/util/styles.dart';
 
 class RunningOrderScreen extends StatelessWidget {
-  const RunningOrderScreen({super.key});
+  RunningOrderScreen({super.key, this.isBackButtonExist});
+
+  final bool? isBackButtonExist;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBarWidget(
-          title: 'running_orders'.tr, isBackButtonExist: false),
+          title: 'running_orders'.tr,
+          isBackButtonExist: isBackButtonExist ?? false),
       body: GetBuilder<OrderController>(builder: (orderController) {
         List<StatusListModel> statusList =
             StatusListModel.getRunningOrderStatusList();

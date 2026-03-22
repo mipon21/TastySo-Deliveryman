@@ -174,27 +174,32 @@ class DashboardScreenState extends State<DashboardScreen> {
                   width: 23,
                   height: 23,
                   isSelected: _pageIndex == 0,
+                  label: 'Home',
                   onTap: () => _setPage(0)),
               BottomNavItemWidget(
                   icon: Images.orderRequestIcon,
                   isSelected: _pageIndex == 1,
                   pageIndex: 1,
+                  label: 'Requests',
                   onTap: () {
                     _navigateRequestPage();
                   }),
               BottomNavItemWidget(
                   icon: Images.runningOrderIcon,
                   isSelected: _pageIndex == 2,
+                  label: 'Running',
                   onTap: () => _setPage(2)),
               BottomNavItemWidget(
                   icon: Images.myOrderIcon,
                   isSelected: _pageIndex == 3,
+                  label: 'Orders',
                   onTap: () => _setPage(3)),
               BottomNavItemWidget(
                   icon: Images.personIcon,
                   width: 28,
                   height: 28,
                   isSelected: _pageIndex == 4,
+                  label: 'Profile',
                   onTap: () => _setPage(4)),
             ]),
           ),

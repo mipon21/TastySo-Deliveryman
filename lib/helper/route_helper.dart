@@ -191,7 +191,12 @@ class RouteHelper {
         name: notification,
         page: () => NotificationScreen(
             fromNotification: Get.parameters['from_notification'] == 'true')),
-    GetPage(name: runningOrder, page: () => const RunningOrderScreen()),
+    GetPage(
+        name: runningOrder,
+        page: () {
+          RunningOrderScreen? runningOrderScreen = Get.arguments;
+          return runningOrderScreen ?? RunningOrderScreen();
+        }),
     GetPage(
         name: terms,
         page: () => const HtmlViewerScreen(isPrivacyPolicy: false)),

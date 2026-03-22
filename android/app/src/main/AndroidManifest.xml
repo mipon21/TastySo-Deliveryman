@@ -35,12 +35,13 @@
         android:icon="@mipmap/launcher_icon"
         android:extractNativeLibs="true"
         android:requestLegacyExternalStorage="true"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:allowNativeHeapPointerTagging="false">
 
         <!-- Google Maps API Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCaCSJ0BZItSyXqBv8vpD1N4WBffJeKhLQ"/>
+            android:value="AIzaSyBOq99IoOKcDs400aBm3iEocN-KwQJcWDY"/>
 
         <!-- Main Activity -->
         <activity
@@ -66,6 +67,11 @@
             <meta-data
                 android:name="com.google.firebase.messaging.default_notification_channel_id"
                 android:value="stackfood"/>
+
+            <!-- Firebase Default Notification Icon -->
+            <meta-data
+                android:name="com.google.firebase.messaging.default_notification_icon"
+                android:resource="@drawable/notification_icon"/>
 
             <!-- Launcher Intent -->
             <intent-filter>

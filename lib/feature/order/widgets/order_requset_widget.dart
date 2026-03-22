@@ -103,6 +103,15 @@ class OrderRequestWidget extends StatelessWidget {
                       ),
                     ])),
                 Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                  Text(
+                    DateConverter.dateTimeStringToTime(orderModel.createdAt!),
+                    style: robotoMedium.copyWith(
+                        color: Theme.of(context)
+                            .textTheme
+                            .bodyLarge
+                            ?.color
+                            ?.withValues(alpha: 0.7)),
+                  ),
                   Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                     Text(
                       DateConverter.getTimeDifference(orderModel.createdAt!)
