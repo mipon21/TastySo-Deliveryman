@@ -106,7 +106,9 @@ class ProfileController extends GetxController implements GetxService {
       _profileModel!.active = _profileModel!.active == 0 ? 1 : 0;
       showCustomSnackBar(responseModel.message, isError: false);
       isSuccess = true;
-      if (_profileModel!.active == 1) {
+      final bool isNowOnline = _profileModel!.active == 1;
+      profileServiceInterface.setOnlineStatus(isNowOnline);
+      if (isNowOnline) {
         profileServiceInterface.checkPermission(() => startLocationRecord());
       } else {
         stopLocationRecord();
@@ -234,34 +236,40 @@ class ProfileController extends GetxController implements GetxService {
               if (item is Map<String, dynamic>) {
                 return EarningHistoryModel.fromJson(item);
               } else if (item is Map) {
-                return EarningHistoryModel.fromJson(Map<String, dynamic>.from(item));
+                return EarningHistoryModel.fromJson(
+                    Map<String, dynamic>.from(item));
               } else {
                 return null;
               }
             })
             .whereType<EarningHistoryModel>()
             .toList();
-        
+
         // Debug: Log to see what data we're getting
         if (transactions.isNotEmpty) {
-          debugPrint('----Earning History First Item - ID: ${transactions.first.id}, OrderID: ${transactions.first.orderId}, Amount: ${transactions.first.amount}');
+          debugPrint(
+              '----Earning History First Item - ID: ${transactions.first.id}, OrderID: ${transactions.first.orderId}, Amount: ${transactions.first.amount}');
         }
       }
-      
+
       // Handle both int and String types for total_size and offset safely
       dynamic totalSize = result['total_size'];
-      _earningHistoryTotalSize = totalSize is int 
+      _earningHistoryTotalSize = totalSize is int
           ? totalSize
-          : (totalSize is String 
-              ? int.tryParse(totalSize) ?? 0 
-              : (totalSize != null ? int.tryParse(totalSize.toString()) ?? 0 : 0));
-      
+          : (totalSize is String
+              ? int.tryParse(totalSize) ?? 0
+              : (totalSize != null
+                  ? int.tryParse(totalSize.toString()) ?? 0
+                  : 0));
+
       dynamic offsetValue = result['offset'];
       _earningHistoryOffset = offsetValue is int
           ? offsetValue
           : (offsetValue is String
               ? int.tryParse(offsetValue) ?? 1
-              : (offsetValue != null ? int.tryParse(offsetValue.toString()) ?? 1 : 1));
+              : (offsetValue != null
+                  ? int.tryParse(offsetValue.toString()) ?? 1
+                  : 1));
 
       if (_earningHistoryList == null) {
         _earningHistoryList = [];

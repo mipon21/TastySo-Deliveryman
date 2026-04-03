@@ -466,6 +466,15 @@ Future<dynamic> myBackgroundMessageHandler(RemoteMessage message) async {
       (notificationBody.notificationType == NotificationType.order ||
           notificationBody.notificationType ==
               NotificationType.order_request)) {
+    // For order_request broadcasts: only alert if rider is online.
+    // Direct assignment (NotificationType.order) is always delivered.
+    if (notificationBody.notificationType == NotificationType.order_request) {
+      final prefs = await SharedPreferences.getInstance();
+      final bool isOnline =
+          prefs.getBool(AppConstants.isActiveStatus) ?? true;
+      if (!isOnline) return;
+    }
+
     FlutterForegroundTask.initCommunicationPort();
 
     _initService();

@@ -11,6 +11,7 @@ abstract class ProfileServiceInterface {
   Future<dynamic> updateActiveStatus({int? shiftId});
   bool isNotificationActive();
   void setNotificationActive(bool isActive);
+  void setOnlineStatus(bool isOnline);
   Future<dynamic> deleteDriver();
   Future<dynamic> getShiftList();
   Future<dynamic> getEarningHistory({int? offset, int? limit});

@@ -13,6 +13,28 @@ rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
+
+// Plugins that ship without src/main/res can fail :packageReleaseResources on AGP 8.6+.
+subprojects { sub ->
+    sub.afterEvaluate {
+        if (!sub.plugins.hasPlugin("com.android.library")) {
+            return
+        }
+        def resRoot = sub.file("src/main/res")
+        if (resRoot.exists() && !resRoot.isDirectory()) {
+            return
+        }
+        def valuesDir = sub.file("src/main/res/values")
+        if (!valuesDir.exists()) {
+            valuesDir.mkdirs()
+        }
+        def stringsXml = sub.file("src/main/res/values/strings.xml")
+        if (!stringsXml.exists()) {
+            stringsXml.text = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<resources/>\n"
+        }
+    }
+}
+
 subprojects {
     afterEvaluate { project ->
         if (project.hasProperty('android')) {

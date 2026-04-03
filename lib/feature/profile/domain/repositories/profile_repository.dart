@@ -80,6 +80,26 @@ class ProfileRepository implements ProfileRepositoryInterface {
   }
 
   @override
+  void setOnlineStatus(bool isOnline) {
+    sharedPreferences.setBool(AppConstants.isActiveStatus, isOnline);
+    if (!GetPlatform.isWeb) {
+      final String? zoneTopic =
+          sharedPreferences.getString(AppConstants.zoneTopic);
+      if (isOnline) {
+        FirebaseMessaging.instance.subscribeToTopic(AppConstants.topic);
+        if (zoneTopic != null && zoneTopic.isNotEmpty) {
+          FirebaseMessaging.instance.subscribeToTopic(zoneTopic);
+        }
+      } else {
+        FirebaseMessaging.instance.unsubscribeFromTopic(AppConstants.topic);
+        if (zoneTopic != null && zoneTopic.isNotEmpty) {
+          FirebaseMessaging.instance.unsubscribeFromTopic(zoneTopic);
+        }
+      }
+    }
+  }
+
+  @override
   void setNotificationActive(bool isActive) {
     if (isActive) {
       _updateToken();

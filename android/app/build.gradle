@@ -50,6 +50,12 @@ android {
         disable 'InvalidPackage'
     }
 
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.tasty.so.delivery"
@@ -58,6 +64,8 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
+        // 16 KB page size: NDK r28 aligns 64-bit ELF segments for 16KB by default
+        ndkVersion "28.0.13004108"
     }
 
      signingConfigs {

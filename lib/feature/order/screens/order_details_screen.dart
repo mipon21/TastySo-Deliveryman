@@ -19,7 +19,6 @@ import 'package:tastyso_delivery_driver/feature/order/domain/models/order_model.
 import 'package:tastyso_delivery_driver/feature/order/widgets/camera_button_sheet_widget.dart';
 import 'package:tastyso_delivery_driver/feature/order/widgets/cancellation_dialogue_widget.dart';
 import 'package:tastyso_delivery_driver/feature/order/widgets/collect_money_delivery_sheet_widget.dart';
-import 'package:tastyso_delivery_driver/feature/order/widgets/dialogue_image_widget.dart';
 import 'package:tastyso_delivery_driver/feature/order/widgets/info_card_widget.dart';
 import 'package:tastyso_delivery_driver/feature/order/widgets/order_product_widget.dart';
 import 'package:tastyso_delivery_driver/feature/order/widgets/slider_button_widget.dart';
@@ -1003,88 +1002,129 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                         borderRadius: BorderRadius.circular(
                                             Dimensions.radiusSmall),
                                       ),
-                                      child: ListView.builder(
-                                        scrollDirection: Axis.horizontal,
-                                        physics: const BouncingScrollPhysics(),
-                                        itemCount: orderController
-                                                .pickedPrescriptions.length +
-                                            1,
-                                        itemBuilder: (context, index) {
-                                          XFile? file = index ==
-                                                  orderController
-                                                      .pickedPrescriptions
-                                                      .length
-                                              ? null
-                                              : orderController
-                                                  .pickedPrescriptions[index];
-
-                                          if (index < 5 &&
-                                              index ==
-                                                  orderController
-                                                      .pickedPrescriptions
-                                                      .length) {
-                                            return InkWell(
-                                              onTap: () {
-                                                Get.bottomSheet(
-                                                    const CameraButtonSheetWidget());
-                                              },
-                                              child: Container(
-                                                height: 60,
-                                                width: 60,
-                                                alignment: Alignment.center,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          Dimensions
-                                                              .radiusDefault),
-                                                  color: Theme.of(context)
-                                                      .primaryColor
-                                                      .withValues(alpha: 0.1),
-                                                ),
-                                                child: Icon(
-                                                    Icons.camera_alt_sharp,
-                                                    color: Theme.of(context)
-                                                        .primaryColor,
-                                                    size: 32),
-                                              ),
-                                            );
-                                          }
-
-                                          return file != null
-                                              ? Container(
-                                                  margin: const EdgeInsets.only(
-                                                      right: Dimensions
-                                                          .paddingSizeSmall),
+                                      child: orderController
+                                              .pickedPrescriptions.isEmpty
+                                          ? Center(
+                                              child: InkWell(
+                                                onTap: () {
+                                                  Get.bottomSheet(
+                                                      const CameraButtonSheetWidget());
+                                                },
+                                                child: Container(
+                                                  height: 60,
+                                                  width: 60,
+                                                  alignment: Alignment.center,
                                                   decoration: BoxDecoration(
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             Dimensions
                                                                 .radiusDefault),
+                                                    color: Theme.of(context)
+                                                        .primaryColor
+                                                        .withValues(alpha: 0.1),
                                                   ),
-                                                  child: Stack(children: [
-                                                    ClipRRect(
-                                                      borderRadius: BorderRadius
-                                                          .circular(Dimensions
-                                                              .radiusDefault),
-                                                      child: GetPlatform.isWeb
-                                                          ? Image.network(
-                                                              file.path,
-                                                              width: 60,
-                                                              height: 60,
-                                                              fit: BoxFit.cover,
-                                                            )
-                                                          : Image.file(
-                                                              File(file.path),
-                                                              width: 60,
-                                                              height: 60,
-                                                              fit: BoxFit.cover,
-                                                            ),
+                                                  child: Icon(
+                                                      Icons.camera_alt_sharp,
+                                                      color: Theme.of(context)
+                                                          .primaryColor,
+                                                      size: 32),
+                                                ),
+                                              ),
+                                            )
+                                          : ListView.builder(
+                                              scrollDirection: Axis.horizontal,
+                                              physics:
+                                                  const BouncingScrollPhysics(),
+                                              itemCount: orderController
+                                                      .pickedPrescriptions
+                                                      .length +
+                                                  1,
+                                              itemBuilder: (context, index) {
+                                                XFile? file = index ==
+                                                        orderController
+                                                            .pickedPrescriptions
+                                                            .length
+                                                    ? null
+                                                    : orderController
+                                                            .pickedPrescriptions[
+                                                        index];
+
+                                                if (index < 5 &&
+                                                    index ==
+                                                        orderController
+                                                            .pickedPrescriptions
+                                                            .length) {
+                                                  return InkWell(
+                                                    onTap: () {
+                                                      Get.bottomSheet(
+                                                          const CameraButtonSheetWidget());
+                                                    },
+                                                    child: Container(
+                                                      height: 60,
+                                                      width: 60,
+                                                      alignment:
+                                                          Alignment.center,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius
+                                                            .circular(Dimensions
+                                                                .radiusDefault),
+                                                        color: Theme.of(context)
+                                                            .primaryColor
+                                                            .withValues(
+                                                                alpha: 0.1),
+                                                      ),
+                                                      child: Icon(
+                                                          Icons
+                                                              .camera_alt_sharp,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .primaryColor,
+                                                          size: 32),
                                                     ),
-                                                  ]),
-                                                )
-                                              : const SizedBox();
-                                        },
-                                      ),
+                                                  );
+                                                }
+
+                                                return file != null
+                                                    ? Container(
+                                                        margin: const EdgeInsets
+                                                            .only(
+                                                            right: Dimensions
+                                                                .paddingSizeSmall),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius: BorderRadius
+                                                              .circular(Dimensions
+                                                                  .radiusDefault),
+                                                        ),
+                                                        child: Stack(children: [
+                                                          ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                    Dimensions
+                                                                        .radiusDefault),
+                                                            child: GetPlatform
+                                                                    .isWeb
+                                                                ? Image.network(
+                                                                    file.path,
+                                                                    width: 60,
+                                                                    height: 60,
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                  )
+                                                                : Image.file(
+                                                                    File(file
+                                                                        .path),
+                                                                    width: 60,
+                                                                    height: 60,
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                  ),
+                                                          ),
+                                                        ]),
+                                                      )
+                                                    : const SizedBox();
+                                              },
+                                            ),
                                     ),
                                   ]),
                             )
@@ -1103,6 +1143,16 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                     child: CustomButtonWidget(
                                       buttonText: 'complete_delivery'.tr,
                                       onPressed: () {
+                                        if (Get.find<SplashController>()
+                                                .configModel!
+                                                .dmPictureUploadStatus! &&
+                                            orderController
+                                                .pickedPrescriptions.isEmpty) {
+                                          showCustomSnackBar(
+                                              'take_a_picture'.tr);
+                                          return;
+                                        }
+
                                         if (Get.find<SplashController>()
                                             .configModel!
                                             .orderDeliveryVerification!) {
@@ -1478,15 +1528,15 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                                                     controllerOrderModel
                                                                             .paymentMethod ==
                                                                         'cash_on_delivery') {
-                                                                  orderController
-                                                                      .changeDeliveryImageStatus();
                                                                   if (Get.find<
                                                                           SplashController>()
                                                                       .configModel!
                                                                       .dmPictureUploadStatus!) {
-                                                                    showCustomBottomSheet(
-                                                                        child:
-                                                                            DialogImageWidget());
+                                                                    if (!orderController
+                                                                        .showDeliveryImageField) {
+                                                                      orderController
+                                                                          .changeDeliveryImageStatus();
+                                                                    }
                                                                   } else {
                                                                     if (Get.find<
                                                                             SplashController>()

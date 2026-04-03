@@ -33,6 +33,7 @@ class OrderLocationScreen extends StatefulWidget {
 class _OrderLocationScreenState extends State<OrderLocationScreen> {
   GoogleMapController? _controller;
   final Set<Marker> _markers = HashSet<Marker>();
+  bool _hasAnimated = false;
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +48,9 @@ class _OrderLocationScreenState extends State<OrderLocationScreen> {
                 double.parse(
                     widget.orderModel.deliveryAddress?.longitude ?? '0'),
               ),
-              zoom: 16),
-          minMaxZoomPreference: const MinMaxZoomPreference(0, 16),
+              zoom: 13),
+          // Allow closer manual zoom on order location map.
+          minMaxZoomPreference: const MinMaxZoomPreference(0, 20),
           zoomControlsEnabled: false,
           markers: _markers,
           style: Get.isDarkMode
@@ -116,8 +118,18 @@ class _OrderLocationScreenState extends State<OrderLocationScreen> {
         print('center bound $centerBounds');
       }
 
-      // Zoom to fit bounds
-      _controller!.moveCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+      // Keep the same zoom in-out effect used on tracking screen.
+      // Prioritize restaurant pin as zoom target.
+      final LatLng zoomTarget =
+          (orderModel.restaurantLat != null && orderModel.restaurantLng != null)
+              ? LatLng(restaurantLat, restaurantLng)
+              : centerBounds;
+      if (!_hasAnimated) {
+        await _animateToLocation(zoomTarget, 16);
+        _hasAnimated = true;
+      } else {
+        _controller!.moveCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+      }
 
       // Clear previous markers
       _markers.clear();
@@ -182,5 +194,15 @@ class _OrderLocationScreenState extends State<OrderLocationScreen> {
     return (await fi.image.toByteData(format: ImageByteFormat.png))!
         .buffer
         .asUint8List();
+  }
+
+  Future<void> _animateToLocation(LatLng targetLocation, double zoom) async {
+    if (_controller != null) {
+      await _controller!.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(target: targetLocation, zoom: zoom - 5)));
+      await Future.delayed(const Duration(milliseconds: 300));
+      await _controller!.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(target: targetLocation, zoom: zoom)));
+    }
   }
 }

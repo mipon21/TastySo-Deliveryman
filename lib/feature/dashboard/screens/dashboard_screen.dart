@@ -75,13 +75,17 @@ class DashboardScreenState extends State<DashboardScreen> {
             message, flutterLocalNotificationsPlugin);
       }
       if (type == 'new_order' /* || type == 'order_request'*/) {
-        Get.find<OrderController>().getCurrentOrders(
-            status: Get.find<OrderController>().selectedRunningOrderStatus!);
-        Get.find<OrderController>().getLatestOrders();
-        Get.dialog(NewRequestDialogWidget(
-            isRequest: true,
-            onTap: () => _navigateRequestPage(),
-            orderId: int.parse(orderID!)));
+        final bool isOnline =
+            Get.find<ProfileController>().profileModel?.active == 1;
+        if (isOnline) {
+          Get.find<OrderController>().getCurrentOrders(
+              status: Get.find<OrderController>().selectedRunningOrderStatus!);
+          Get.find<OrderController>().getLatestOrders();
+          Get.dialog(NewRequestDialogWidget(
+              isRequest: true,
+              onTap: () => _navigateRequestPage(),
+              orderId: int.parse(orderID!)));
+        }
       } else if (type == 'assign' && orderID != null && orderID.isNotEmpty) {
         Get.find<OrderController>().getCurrentOrders(
             status: Get.find<OrderController>().selectedRunningOrderStatus!);

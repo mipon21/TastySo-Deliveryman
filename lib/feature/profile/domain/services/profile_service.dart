@@ -48,6 +48,11 @@ class ProfileService implements ProfileServiceInterface {
   }
 
   @override
+  void setOnlineStatus(bool isOnline) {
+    profileRepositoryInterface.setOnlineStatus(isOnline);
+  }
+
+  @override
   Future<ResponseModel> deleteDriver() async {
     return await profileRepositoryInterface.deleteDriver();
   }

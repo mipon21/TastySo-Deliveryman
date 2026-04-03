@@ -11,6 +11,7 @@ abstract class ProfileRepositoryInterface implements RepositoryInterface {
   Future<dynamic> updateActiveStatus({int? shiftId});
   bool isNotificationActive();
   void setNotificationActive(bool isActive);
+  void setOnlineStatus(bool isOnline);
   Future<dynamic> deleteDriver();
   Future<dynamic> getShiftList();
   Future<Map<String, dynamic>?> getEarningHistory({int? offset, int? limit});

@@ -29,11 +29,11 @@
     </queries>
 
     <application
-        tools:replace="android:label"
+        tools:replace="android:label,android:extractNativeLibs"
         android:name="${applicationName}"
         android:label="TastySo Rider"
         android:icon="@mipmap/launcher_icon"
-        android:extractNativeLibs="true"
+        android:extractNativeLibs="false"
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true"
         android:allowNativeHeapPointerTagging="false">

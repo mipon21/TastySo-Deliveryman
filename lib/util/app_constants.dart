@@ -3,7 +3,7 @@ import 'package:tastyso_delivery_driver/util/images.dart';
 
 class AppConstants {
   static const String appName = 'TastySo Rider';
-  static const double appVersion = 1.0;
+  static const double appVersion = 1.1;
 
   ///Flutter SDK: 3.32.7
 
@@ -102,6 +102,7 @@ class AppConstants {
   static const String langIntro = 'language_intro';
   static const String maintenanceModeTopic = 'maintenance_mode_deliveryman_app';
   static const String notificationIdList = 'notification_id_list';
+  static const String isActiveStatus = 'is_active_status';
 
   static List<LanguageModel> languages = [
     LanguageModel(
