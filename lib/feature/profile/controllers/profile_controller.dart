@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:tastyso_delivery_driver/common/models/response_model.dart';
 import 'package:tastyso_delivery_driver/common/widgets/custom_snackbar_widget.dart';
 import 'package:tastyso_delivery_driver/feature/auth/controllers/auth_controller.dart';
@@ -64,6 +64,7 @@ class ProfileController extends GetxController implements GetxService {
     ProfileModel? profileModel = await profileServiceInterface.getProfileInfo();
     if (profileModel != null) {
       _profileModel = profileModel;
+      profileServiceInterface.setOnlineStatus(_profileModel!.active == 1);
       if (_profileModel!.active == 1) {
         profileServiceInterface.checkPermission(() => startLocationRecord());
       } else {
@@ -93,16 +94,20 @@ class ProfileController extends GetxController implements GetxService {
     return isSuccess;
   }
 
-  Future<bool> updateActiveStatus({int? shiftId, bool isUpdate = false}) async {
+  Future<bool> updateActiveStatus({
+    int? shiftId,
+    bool isUpdate = false,
+    bool popAfterSuccess = true,
+  }) async {
     _shiftLoading = true;
-    if (isUpdate) {
-      update();
-    }
+    update();
     ResponseModel responseModel =
         await profileServiceInterface.updateActiveStatus(shiftId: shiftId);
     bool isSuccess;
     if (responseModel.isSuccess) {
-      Get.back();
+      if (popAfterSuccess) {
+        Get.back();
+      }
       _profileModel!.active = _profileModel!.active == 0 ? 1 : 0;
       showCustomSnackBar(responseModel.message, isError: false);
       isSuccess = true;
@@ -119,6 +124,69 @@ class ProfileController extends GetxController implements GetxService {
     _shiftLoading = false;
     update();
     return isSuccess;
+  }
+
+  /// After login, turns active status on when the profile is still offline.
+  Future<void> ensureOnlineAfterLogin() async {
+    if (_profileModel == null || _profileModel!.active == 1) {
+      return;
+    }
+    await updateActiveStatus(popAfterSuccess: false);
+  }
+
+  void _showLogoutOfflineLoadingDialog() {
+    Get.dialog(
+      PopScope(
+        canPop: false,
+        child: Center(
+          child: Material(
+            elevation: 6,
+            borderRadius: BorderRadius.circular(12),
+            color: Get.theme.cardColor,
+            child: Padding(
+              padding: const EdgeInsets.all(28),
+              child: SizedBox(
+                width: 40,
+                height: 40,
+                child: CircularProgressIndicator(
+                  strokeWidth: 3,
+                  color: Get.theme.colorScheme.primary,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  /// Logs out after taking the rider offline on the server when currently online.
+  Future<void> logoutDeliveryMan() async {
+    final bool wasOnline =
+        _profileModel != null && _profileModel!.active == 1;
+
+    Get.back();
+
+    if (wasOnline) {
+      _showLogoutOfflineLoadingDialog();
+      try {
+        final bool wentOffline =
+            await updateActiveStatus(popAfterSuccess: false);
+        if (!wentOffline) {
+          showCustomSnackBar('sorry_something_went_wrong'.tr);
+          return;
+        }
+      } finally {
+        if (Get.isDialogOpen == true) {
+          Get.back();
+        }
+      }
+    }
+
+    await Get.find<AuthController>().clearSharedData();
+    stopLocationRecord();
+    Get.offAllNamed(RouteHelper.getSignInRoute());
   }
 
   void pickImage() async {

@@ -218,8 +218,15 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
           if (value.isSuccess) {
             Get.find<AuthController>()
                 .login('+${widget.number!.trim()}', password)
-                .then((value) async {
-              Get.offAllNamed(RouteHelper.getInitialRoute());
+                .then((loginStatus) async {
+              if (loginStatus.isSuccess) {
+                final profileController = Get.find<ProfileController>();
+                await profileController.getProfile();
+                await profileController.ensureOnlineAfterLogin();
+                Get.offAllNamed(RouteHelper.getInitialRoute());
+              } else {
+                showCustomSnackBar(loginStatus.message);
+              }
             });
           } else {
             showCustomSnackBar(value.message);

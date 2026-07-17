@@ -217,7 +217,9 @@ class SignInViewScreen extends StatelessWidget {
           } else {
             authController.clearUserNumberAndPassword();
           }
-          await Get.find<ProfileController>().getProfile();
+          final profileController = Get.find<ProfileController>();
+          await profileController.getProfile();
+          await profileController.ensureOnlineAfterLogin();
           Get.offAllNamed(RouteHelper.getInitialRoute());
         } else {
           showCustomSnackBar(status.message);

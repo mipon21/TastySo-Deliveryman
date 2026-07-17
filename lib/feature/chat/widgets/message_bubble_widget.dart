@@ -6,6 +6,7 @@ import 'package:tastyso_delivery_driver/feature/chat/widgets/chat_video_view.dar
 import 'package:tastyso_delivery_driver/feature/chat/widgets/image_file_view_widget.dart';
 import 'package:tastyso_delivery_driver/feature/chat/widgets/pdf_view_widget.dart';
 import 'package:tastyso_delivery_driver/feature/language/controllers/localization_controller.dart';
+import 'package:tastyso_delivery_driver/feature/profile/controllers/profile_controller.dart';
 import 'package:tastyso_delivery_driver/helper/user_type_helper.dart';
 import 'package:tastyso_delivery_driver/util/color_resources.dart';
 import 'package:tastyso_delivery_driver/util/dimensions.dart';
@@ -29,10 +30,17 @@ class MessageBubbleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isRightMessage = currentMessage.senderId == user!.id;
     bool isLTR = Get.find<LocalizationController>().isLtr;
 
     return GetBuilder<ChatController>(builder: (chatController) {
+      Conversation? conversation = chatController.messageModel?.conversation;
+      int? currentUserInfoId = _resolveCurrentUserInfoId(conversation);
+      User? oppositeUser =
+          _resolveOppositeUser(conversation, currentUserInfoId) ?? user;
+      bool isRightMessage = currentUserInfoId != null
+          ? currentMessage.senderId == currentUserInfoId
+          : currentMessage.senderId == user?.id;
+
       String chatTime = chatController.getChatTime(
           currentMessage.createdAt!, nextMessage?.createdAt);
       String previousMessageHasChatTime = previousMessage != null
@@ -124,7 +132,7 @@ class MessageBubbleWidget extends StatelessWidget {
                                         fit: BoxFit.cover,
                                         width: 40,
                                         height: 40,
-                                        image: '${user!.imageFullUrl}',
+                                      image: '${oppositeUser?.imageFullUrl ?? ''}',
                                       ),
                                     )
                                   : !isRightMessage
@@ -470,6 +478,42 @@ class MessageBubbleWidget extends StatelessWidget {
       return true;
     }
     return false;
+  }
+
+  int? _resolveCurrentUserInfoId(Conversation? conversation) {
+    int? profileId = Get.find<ProfileController>().profileModel?.id;
+    if (profileId == null || conversation == null) {
+      return null;
+    }
+
+    bool senderIsCurrentUser =
+        conversation.sender?.deliveryManId == profileId ||
+            conversation.sender?.vendorId == profileId ||
+            conversation.sender?.userId == profileId;
+    bool receiverIsCurrentUser =
+        conversation.receiver?.deliveryManId == profileId ||
+            conversation.receiver?.vendorId == profileId ||
+            conversation.receiver?.userId == profileId;
+
+    if (senderIsCurrentUser) {
+      return conversation.sender?.id;
+    } else if (receiverIsCurrentUser) {
+      return conversation.receiver?.id;
+    }
+    return null;
+  }
+
+  User? _resolveOppositeUser(Conversation? conversation, int? currentUserInfoId) {
+    if (conversation == null || currentUserInfoId == null) {
+      return null;
+    }
+
+    if (conversation.sender?.id == currentUserInfoId) {
+      return conversation.receiver;
+    } else if (conversation.receiver?.id == currentUserInfoId) {
+      return conversation.sender;
+    }
+    return null;
   }
 
   bool _isVideo(String url) {

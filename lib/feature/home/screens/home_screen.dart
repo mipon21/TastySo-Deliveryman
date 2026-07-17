@@ -210,61 +210,78 @@ class _HomeScreenState extends State<HomeScreen> {
             return GetBuilder<OrderController>(builder: (orderController) {
               return (profileController.profileModel != null &&
                       orderController.currentOrderList != null)
-                  ? FlutterSwitch(
-                      width: 75,
-                      height: 30,
-                      valueFontSize: Dimensions.fontSizeExtraSmall,
-                      showOnOff: true,
-                      activeText: 'online'.tr,
-                      inactiveText: 'offline'.tr,
-                      activeColor: Theme.of(context).primaryColor,
-                      value: profileController.profileModel!.active == 1,
-                      onToggle: (bool isActive) async {
-                        if (!isActive &&
-                            orderController.currentOrderList!.isNotEmpty) {
-                          showCustomSnackBar('you_can_not_go_offline_now'.tr);
-                        } else {
-                          if (!isActive) {
-                            showCustomBottomSheet(
-                              child: CustomConfirmationBottomSheet(
-                                title: 'offline'.tr,
-                                description: 'are_you_sure_to_offline'.tr,
-                                onConfirm: () {
-                                  profileController.updateActiveStatus(
-                                      isUpdate: true);
-                                },
+                  ? (profileController.shiftLoading
+                      ? SizedBox(
+                          width: 75,
+                          height: 30,
+                          child: Center(
+                            child: SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Theme.of(context).primaryColor,
                               ),
-                            );
-                          } else {
-                            LocationPermission permission =
-                                await Geolocator.checkPermission();
-                            if (permission == LocationPermission.denied ||
-                                permission ==
-                                    LocationPermission.deniedForever ||
-                                (GetPlatform.isIOS
-                                    ? false
-                                    : permission ==
-                                        LocationPermission.whileInUse)) {
-                              _checkPermission(() {
-                                if (profileController.shifts != null &&
-                                    profileController.shifts!.isNotEmpty) {
-                                  Get.dialog(const ShiftDialogueWidget());
-                                } else {
-                                  profileController.updateActiveStatus();
-                                }
-                              });
+                            ),
+                          ),
+                        )
+                      : FlutterSwitch(
+                          width: 75,
+                          height: 30,
+                          valueFontSize: Dimensions.fontSizeExtraSmall,
+                          showOnOff: true,
+                          activeText: 'online'.tr,
+                          inactiveText: 'offline'.tr,
+                          activeColor: Theme.of(context).primaryColor,
+                          value: profileController.profileModel!.active == 1,
+                          onToggle: (bool isActive) async {
+                            if (!isActive &&
+                                orderController.currentOrderList!.isNotEmpty) {
+                              showCustomSnackBar(
+                                  'you_can_not_go_offline_now'.tr);
                             } else {
-                              if (profileController.shifts != null &&
-                                  profileController.shifts!.isNotEmpty) {
-                                Get.dialog(const ShiftDialogueWidget());
+                              if (!isActive) {
+                                showCustomBottomSheet(
+                                  child: CustomConfirmationBottomSheet(
+                                    title: 'offline'.tr,
+                                    description: 'are_you_sure_to_offline'.tr,
+                                    onConfirm: () {
+                                      profileController.updateActiveStatus(
+                                          isUpdate: true);
+                                    },
+                                  ),
+                                );
                               } else {
-                                profileController.updateActiveStatus();
+                                LocationPermission permission =
+                                    await Geolocator.checkPermission();
+                                if (permission == LocationPermission.denied ||
+                                    permission ==
+                                        LocationPermission.deniedForever ||
+                                    (GetPlatform.isIOS
+                                        ? false
+                                        : permission ==
+                                            LocationPermission.whileInUse)) {
+                                  _checkPermission(() {
+                                    if (profileController.shifts != null &&
+                                        profileController
+                                            .shifts!.isNotEmpty) {
+                                      Get.dialog(const ShiftDialogueWidget());
+                                    } else {
+                                      profileController.updateActiveStatus();
+                                    }
+                                  });
+                                } else {
+                                  if (profileController.shifts != null &&
+                                      profileController.shifts!.isNotEmpty) {
+                                    Get.dialog(const ShiftDialogueWidget());
+                                  } else {
+                                    profileController.updateActiveStatus();
+                                  }
+                                }
                               }
                             }
-                          }
-                        }
-                      },
-                    )
+                          },
+                        ))
                   : const SizedBox();
             });
           }),

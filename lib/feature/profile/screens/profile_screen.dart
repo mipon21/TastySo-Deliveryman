@@ -4,7 +4,6 @@ import 'package:tastyso_delivery_driver/common/widgets/custom_bottom_sheet_widge
 import 'package:tastyso_delivery_driver/common/widgets/custom_confirmation_bottom_sheet.dart';
 import 'package:tastyso_delivery_driver/common/widgets/custom_image_widget.dart';
 import 'package:tastyso_delivery_driver/common/widgets/details_custom_card.dart';
-import 'package:tastyso_delivery_driver/feature/auth/controllers/auth_controller.dart';
 import 'package:tastyso_delivery_driver/feature/language/controllers/localization_controller.dart';
 import 'package:tastyso_delivery_driver/feature/language/widgets/language_bottom_sheet_widget.dart';
 import 'package:tastyso_delivery_driver/feature/splash/controllers/splash_controller.dart';
@@ -333,11 +332,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   title: 'logout'.tr,
                                   description: 'are_you_sure_to_logout'.tr,
                                   onConfirm: () {
-                                    Get.find<AuthController>()
-                                        .clearSharedData();
-                                    profileController.stopLocationRecord();
-                                    Get.offAllNamed(
-                                        RouteHelper.getSignInRoute());
+                                    profileController.logoutDeliveryMan();
                                   },
                                 ),
                               );

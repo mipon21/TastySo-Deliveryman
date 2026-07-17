@@ -65,7 +65,7 @@ android {
         versionName flutterVersionName
         multiDexEnabled true
         // 16 KB page size: NDK r28 aligns 64-bit ELF segments for 16KB by default
-        ndkVersion "28.0.13004108"
+        ndkVersion "28.2.13676358"
     }
 
      signingConfigs {

@@ -86,12 +86,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Background Service -->
-        <service
-            android:name="com.sixamtech.stack_food_delivery.BackgroundService"
-            android:enabled="true"
-            android:exported="false"/>
-
         <!-- Foreground Task Service -->
         <service
             android:name="com.pravera.flutter_foreground_task.service.ForegroundService"

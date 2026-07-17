@@ -2,7 +2,7 @@ name: tastyso_delivery_driver
 description: A new Flutter application.
 publish_to: 'none' #
 # +N must always be greater than the highest versionCode ever uploaded to Play (all tracks).
-version: 1.0.2+10
+version: 1.0.3+15
 
 environment:
   sdk: ^3.5.0

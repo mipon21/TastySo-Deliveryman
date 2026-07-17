@@ -3,7 +3,7 @@ import 'package:tastyso_delivery_driver/util/images.dart';
 
 class AppConstants {
   static const String appName = 'TastySo Rider';
-  static const double appVersion = 1.1;
+  static const double appVersion = 1.5;
 
   ///Flutter SDK: 3.32.7
 

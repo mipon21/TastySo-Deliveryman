@@ -153,9 +153,23 @@ class NotificationHelper {
       } else {
         String? type = message.data['type'];
 
-        if (type != 'assign' &&
-            type != 'new_order' &&
-            type != 'order_request') {
+        // Pool / new-order alerts: show heads-up + sound in foreground (background uses myBackgroundMessageHandler + foreground service).
+        if (type == 'order_request' || type == 'new_order') {
+          NotificationHelper.showNotification(
+            message,
+            flutterLocalNotificationsPlugin,
+          );
+          if (Get.find<AuthController>().isLoggedIn()) {
+            Get.find<OrderController>().getLatestOrders();
+          }
+        } else if (type == 'order_request_cancel') {
+          int? oid;
+          final String rawId = message.data['order_id']?.toString() ?? '';
+          if (rawId.isNotEmpty) {
+            oid = int.tryParse(rawId);
+          }
+          NotificationHelper.dismissForegroundNotificationForOrder(oid);
+        } else if (type != 'assign') {
           NotificationHelper.showNotification(
             message,
             flutterLocalNotificationsPlugin,
@@ -407,9 +421,15 @@ class NotificationHelper {
             ? UserType.user.name
             : UserType.vendor.name,
       );
-    } else if (data['type'] == 'order_request') {
+    } else if (data['type'] == 'order_request' || data['type'] == 'new_order') {
+      int? oid;
+      final String rawId = data['order_id']?.toString() ?? '';
+      if (rawId.isNotEmpty) {
+        oid = int.tryParse(rawId);
+      }
       return NotificationBodyModel(
         notificationType: NotificationType.order_request,
+        orderId: oid,
       );
     } else if (data['type'] == 'block') {
       return NotificationBodyModel(notificationType: NotificationType.block);
@@ -459,6 +479,16 @@ class NotificationHelper {
 Future<dynamic> myBackgroundMessageHandler(RemoteMessage message) async {
   WidgetsFlutterBinding.ensureInitialized();
   customPrint("onBackground: ${message.data}");
+
+  if (message.data['type'] == 'order_request_cancel') {
+    int? oid;
+    final String rawId = message.data['order_id']?.toString() ?? '';
+    if (rawId.isNotEmpty) {
+      oid = int.tryParse(rawId);
+    }
+    await NotificationHelper.dismissForegroundNotificationForOrder(oid);
+    return;
+  }
   NotificationBodyModel? notificationBody =
       NotificationHelper.convertNotification(message.data);
 
@@ -480,7 +510,7 @@ Future<dynamic> myBackgroundMessageHandler(RemoteMessage message) async {
     _initService();
 
     await _startService(
-      notificationBody.orderId.toString(),
+      notificationBody.orderId?.toString(),
       notificationBody.notificationType!,
     );
   }

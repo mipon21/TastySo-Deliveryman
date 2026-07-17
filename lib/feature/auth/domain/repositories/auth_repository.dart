@@ -73,10 +73,6 @@ class AuthRepository implements AuthRepositoryInterface {
         deviceToken = await _saveDeviceToken();
       }
       if (!GetPlatform.isWeb) {
-        FirebaseMessaging.instance.subscribeToTopic(AppConstants.topic);
-        FirebaseMessaging.instance.subscribeToTopic(
-            sharedPreferences.getString(AppConstants.zoneTopic)!);
-
         FirebaseMessaging.instance
             .subscribeToTopic(AppConstants.maintenanceModeTopic);
       }
@@ -102,8 +98,11 @@ class AuthRepository implements AuthRepositoryInterface {
   Future<bool> clearSharedData() async {
     if (!GetPlatform.isWeb) {
       await FirebaseMessaging.instance.unsubscribeFromTopic(AppConstants.topic);
-      FirebaseMessaging.instance.unsubscribeFromTopic(
-          sharedPreferences.getString(AppConstants.zoneTopic)!);
+      final String? zoneTopic =
+          sharedPreferences.getString(AppConstants.zoneTopic);
+      if (zoneTopic != null && zoneTopic.isNotEmpty) {
+        await FirebaseMessaging.instance.unsubscribeFromTopic(zoneTopic);
+      }
 
       apiClient.postData(
           AppConstants.tokenUri, {"_method": "put", "token": getUserToken()},
@@ -115,6 +114,7 @@ class AuthRepository implements AuthRepositoryInterface {
     await sharedPreferences.remove(AppConstants.userPassword);
     await sharedPreferences.remove(AppConstants.userNumber);
     await sharedPreferences.remove(AppConstants.userCountryCode);
+    await sharedPreferences.remove(AppConstants.isActiveStatus);
     await clearUserNumberAndPassword();
     apiClient.updateHeader(null, null);
     return true;

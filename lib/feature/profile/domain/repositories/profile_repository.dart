@@ -85,7 +85,10 @@ class ProfileRepository implements ProfileRepositoryInterface {
     if (!GetPlatform.isWeb) {
       final String? zoneTopic =
           sharedPreferences.getString(AppConstants.zoneTopic);
-      if (isOnline) {
+      final bool notificationsOn =
+          sharedPreferences.getBool(AppConstants.notification) ?? true;
+      final bool subscribeOrderTopics = isOnline && notificationsOn;
+      if (subscribeOrderTopics) {
         FirebaseMessaging.instance.subscribeToTopic(AppConstants.topic);
         if (zoneTopic != null && zoneTopic.isNotEmpty) {
           FirebaseMessaging.instance.subscribeToTopic(zoneTopic);
@@ -107,8 +110,11 @@ class ProfileRepository implements ProfileRepositoryInterface {
       if (!GetPlatform.isWeb) {
         _updateToken(notificationDeviceToken: '@');
         FirebaseMessaging.instance.unsubscribeFromTopic(AppConstants.topic);
-        FirebaseMessaging.instance.unsubscribeFromTopic(
-            sharedPreferences.getString(AppConstants.zoneTopic)!);
+        final String? zoneTopic =
+            sharedPreferences.getString(AppConstants.zoneTopic);
+        if (zoneTopic != null && zoneTopic.isNotEmpty) {
+          FirebaseMessaging.instance.unsubscribeFromTopic(zoneTopic);
+        }
       }
     }
     sharedPreferences.setBool(AppConstants.notification, isActive);
@@ -196,12 +202,20 @@ class ProfileRepository implements ProfileRepositoryInterface {
         deviceToken = await _saveDeviceToken();
       }
       if (!GetPlatform.isWeb) {
-        FirebaseMessaging.instance.subscribeToTopic(AppConstants.topic);
-        FirebaseMessaging.instance.subscribeToTopic(
-            sharedPreferences.getString(AppConstants.zoneTopic)!);
-
         FirebaseMessaging.instance
             .subscribeToTopic(AppConstants.maintenanceModeTopic);
+        final bool notificationsOn =
+            sharedPreferences.getBool(AppConstants.notification) ?? true;
+        final bool isOnline =
+            sharedPreferences.getBool(AppConstants.isActiveStatus) ?? false;
+        if (notificationsOn && isOnline) {
+          final String? zoneTopic =
+              sharedPreferences.getString(AppConstants.zoneTopic);
+          FirebaseMessaging.instance.subscribeToTopic(AppConstants.topic);
+          if (zoneTopic != null && zoneTopic.isNotEmpty) {
+            FirebaseMessaging.instance.subscribeToTopic(zoneTopic);
+          }
+        }
       }
     }
     return await apiClient.postData(

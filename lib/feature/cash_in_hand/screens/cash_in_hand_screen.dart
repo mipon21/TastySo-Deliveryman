@@ -11,6 +11,7 @@ import 'package:tastyso_delivery_driver/util/dimensions.dart';
 import 'package:tastyso_delivery_driver/util/images.dart';
 import 'package:tastyso_delivery_driver/util/styles.dart';
 import 'package:tastyso_delivery_driver/common/widgets/custom_app_bar_widget.dart';
+// ignore: unused_import — used by commented-out adjust-payments dialog below.
 import 'package:tastyso_delivery_driver/common/widgets/custom_button_widget.dart';
 import 'package:tastyso_delivery_driver/common/widgets/custom_image_widget.dart';
 import 'package:flutter/material.dart';
@@ -152,6 +153,7 @@ class _CashInHandScreenState extends State<CashInHandScreen> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
+                                            /*
                                             profileController
                                                     .profileModel!.adjustable!
                                                 ? InkWell(
@@ -255,6 +257,9 @@ class _CashInHandScreenState extends State<CashInHandScreen> {
                                                     ? Dimensions
                                                         .paddingSizeLarge
                                                     : 0),
+                                            */
+                                            const SizedBox.shrink(),
+                                            const SizedBox(height: 0),
                                             InkWell(
                                               onTap: () {
                                                 if (profileController
